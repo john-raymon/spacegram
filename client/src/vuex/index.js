@@ -31,9 +31,10 @@ export default new Vuex.Store({
       context.commit("setUserAuth", authData);
     },
     logout(context) {
-      // clear jwt from localforage
-      Agent.setToken('')
-      return context.commit("resetAuth");
+        const $http = new Agent('/api');
+        $http._get('/users/logout').then(() => {
+        return context.commit("resetAuth");
+      })
     }
   },
   plugins: [persist.plugin]

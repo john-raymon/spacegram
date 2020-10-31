@@ -26,15 +26,7 @@ module.exports = {
     function(req, res, next) {
       const requiredProps = [
         ['email', 'Your email is required'],
-        ['firstName', 'Your first name is required.'],
-        ['password', 'A password is required'],
-        ['lastName', 'Your last name is required'],
-        ['billingAddressLine', 'You must provide your billing street address.'],
-        ['billingCity', 'You must provide your billing city.'],
-        ['billingState', 'You must provide your billing state.'],
-        ['billingPostalCode', 'You must provide your billing postal code.'],
-        ['billingCountry', 'You must provide your billing country.'],
-        ['phoneNumber', 'You must provide a phone number.'],
+        ['password', 'A password is required']
       ];
 
       const { hasMissingProps, propErrors } = isBodyMissingProps(
@@ -98,7 +90,7 @@ module.exports = {
           return user
             .save()
             .then(function(user) {
-              return res.json({ success: true, user: user.authSerialize() });
+              return req.login(user, () => res.json({ success: true, user: user.authSerialize() }));
             })
         })
         .catch(next);
@@ -121,17 +113,21 @@ module.exports = {
         });
       }
       const { email, password } = req.body;
-      return next()
+      return userPassport.authenticate("local", function(err, user, data) {
+        if (err) {
+          return next(err);
+        }
+        if (!user) {
+          return next({ ...data, success: false });
+        }
+        user.lastLoginAt = Date.now();
+        return user.save().then(() => {
+          return req.login(user, () => res.json({ success: true, user: user.authSerialize() }));
+        })
+      })(req, res, next);
     },
-    (req, res, next) => userPassport.authenticate("local", function(err, user, data) {
-      if (err) {
-        return next(err);
-      }
-      if (!user) {
-        return next({ ...data, success: false });
-      }
-
-      return res.json({ success: true, user: user.authSerialize() });
-    })(req, res, next),
+  ],
+  logout: [
+    (req, res, next) => req.logout()
   ]
 };

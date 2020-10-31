@@ -3,7 +3,6 @@ const crypto = require("crypto");
 const uniqueValidator = require("mongoose-unique-validator");
 const config = require('config');
 const secret = config.get('app.secret');
-const jwt = require("jsonwebtoken");
 const { accessSync } = require("fs");
 
 const UserSchema = new mongoose.Schema(
@@ -16,6 +15,7 @@ const UserSchema = new mongoose.Schema(
       required: [true, "is required"],
       match: [/\S+@\S+\.\S+/, "is invalid"]
     },
+    lastLoginAt: Date,
     isEmailConfirmed: {
       type: Boolean,
       default: false
@@ -23,12 +23,10 @@ const UserSchema = new mongoose.Schema(
     firstName: {
       type: String,
       lowercase: true,
-      required: [true, "is required"]
     },
     lastName: {
       type: String,
       lowercase: true,
-      required: [true, "is required"]
     },
     phoneNumber: {
       type: String,
@@ -63,36 +61,16 @@ UserSchema.methods.validPassword = function(password) {
   return this.hash === hash;
 };
 
-UserSchema.methods.generateJWT = function() {
-  const today = new Date();
-  let exp = new Date(today);
-  exp.setDate(today.getDate() + 30);
-
-  return jwt.sign(
-    {
-      sub: "user",
-      id: this._id,
-      exp: parseInt(exp.getTime() / 1000)
-    },
-    secret
-  );
-};
-
-UserSchema.methods.authSerialize = function(accessToken = true) {
+UserSchema.methods.authSerialize = function() {
   return {
     id: this.id,
     email: this.email,
     firstName: this.firstName,
     lastName: this.lastName,
     isEmailConfirmed: this.isEmailConfirmed,
-    accessToken: (() => {
-      if (!accessToken) {
-        return undefined;
-      }
-      return this.generateJWT();
-    })(),
     billing: this.billing,
-    phoneNumber: this.phoneNumber
+    phoneNumber: this.phoneNumber,
+    lastLoginAt: new Date(this.lastLoginAt).toUTCString(),
   };
 };
 

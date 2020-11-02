@@ -7,6 +7,7 @@ const router = express.Router();
  * exported from this module
  */
 router.use('/users', require('./users'));
+router.use('/posts', require('./posts'));
 
 /**
  * error-handler (hence the 4 argument signature)

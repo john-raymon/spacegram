@@ -3,10 +3,12 @@ const router = express.Router();
 const Post = require("@/models/Post");
 const middleware = require('@/middleware');
 const service = require("@/services/posts");
+const { populate } = require("../../models/User");
 
 // callback trigger for postId param
 router.param(":postId", function(req, res, next, postId) {
   return Post.findById(postId)
+    .populate('user')
     .exec()
     .then(function(post) {
       if (!post) {

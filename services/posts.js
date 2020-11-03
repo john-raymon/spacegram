@@ -20,7 +20,7 @@ module.exports = {
   read: [
     (req, res, next) => {
       // only give authorization to user of post
-      if (req.user.id !== req.post.id) {
+      if (req.user.id !== req.post.user.id) {
         return next({
           name: "ForbiddenError",
         })
@@ -32,7 +32,14 @@ module.exports = {
    * create a new image post
    */
   create: [
-    multerCloudinaryMiddleware.single('postFile'),
+    (req, res, next) => {
+      multerCloudinaryMiddleware.single('file')(req, res, (err) => {
+        if (err || !req.file) {
+          return next(err || Error("We weren't able to create your post right now."));
+        }
+        return next();
+      });
+    },
     function(req, res, next) {
 
       const post = new Post({

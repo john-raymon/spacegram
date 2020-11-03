@@ -23,6 +23,14 @@ router.use(function(err, req, res, next) {
    * app-level middleware
    */
 
+  if (err.name === "ForbiddenError") {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied.",
+      ...err,
+    });
+  }
+
   if (err.name === "UnauthorizedError") {
     return res.status(401).json({
       success: false,

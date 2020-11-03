@@ -12,7 +12,8 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "beta-onlyinsta",
-    allowedFormats: ["mp4", "ogv", "jpg", "png", "pdf"],
+    allowedFormats: ['mp4', 'ogv', 'jpg', 'pdf', 'mov', '3gpp', 'avi', 'wmv', 'm3u8'],
+    resource_type: "auto",
     transformation: { width: 0.7, quality: 70 },
   }
 });

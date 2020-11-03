@@ -41,15 +41,15 @@ module.exports = {
       });
     },
     function(req, res, next) {
-
       const post = new Post({
         user: req.user.id,
         title: req.body.title,
         description: req.body.description,
-        images: {
+        files: {
           [req.file.filename]: {
             url: req.file.path,
-            public_id: req.file.filename
+            public_id: req.file.filename,
+            ...req.file,
           }
         }
       });

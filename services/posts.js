@@ -20,19 +20,22 @@ module.exports = {
     multerCloudinaryMiddleware.single('postFile'),
     function(req, res, next) {
       debugger;
-      const requiredProps = [
-        ['postFile', 'A video or photo is required', true]
-      ];
+      const post = new Post({
+        user: req.user.id,
+        title: req.body.title,
+        description: req.body.description,
+        images: {
+          [req.file.filename]: {
+            url: req.file.path,
+            public_id: req.file.filename
+          }
+        }
+      });
 
-      const { hasMissingProps, propErrors } = isBodyMissingProps(requiredProps, req.body);
-
-      if (hasMissingProps) {
-        next({
-          name: "ValidationError",
-          errors: propErrors,
-        })
-      }
-
+      return post.save().then(post => {
+        res.json({ success: true, ...post.jsonSerialize(), })
+      })
+      .catch(next)
     },
   ]
 }

@@ -16,7 +16,7 @@ const PostSchema = mongoose.Schema({
   },
 });
 
-PostSchema.methods.JsonSerialize = function() {
+PostSchema.methods.jsonSerialize = function() {
   const {
     id,
     title,

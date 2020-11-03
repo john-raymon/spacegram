@@ -15,6 +15,7 @@ const logger = require('morgan');
 const helmet = require('helmet');
 const history = require('connect-history-api-fallback');
 const passport = require("passport");
+const bodyParser = require("body-parser");
 const app = express();
 
 // Set up Mongodb

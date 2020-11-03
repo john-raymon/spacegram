@@ -3,7 +3,6 @@ const crypto = require("crypto");
 const uniqueValidator = require("mongoose-unique-validator");
 const config = require('config');
 const secret = config.get('app.secret');
-const { accessSync } = require("fs");
 
 const UserSchema = new mongoose.Schema(
   {

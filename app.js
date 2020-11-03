@@ -15,6 +15,7 @@ const logger = require('morgan');
 const helmet = require('helmet');
 const history = require('connect-history-api-fallback');
 const passport = require("passport");
+const bodyParser = require("body-parser");
 const app = express();
 
 // Set up Mongodb
@@ -78,7 +79,7 @@ app.get("/*", function(req, res) {
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  return next(createError(404));
 });
 
 // error handler
@@ -88,7 +89,7 @@ app.use(function(err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
-  res.status(err.status || 500).json(err);
+  return res.status(err.status || 500).json({ message: err.message });
 });
 
 module.exports = app;

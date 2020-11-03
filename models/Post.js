@@ -1,0 +1,35 @@
+const mongoose = require("mongoose");
+
+const PostSchema = mongoose.Schema({
+  title: String,
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  description: String,
+  deleted: Boolean,
+  format: String,
+  files: {
+    type: Map,
+    default: new Map()
+  },
+});
+
+PostSchema.methods.jsonSerialize = function() {
+  const {
+    id,
+    title,
+    files,
+    deleted,
+    description,
+  } = this;
+
+  return {
+    id,
+    title,
+    files,
+    deleted,
+    description,
+  };
+}
+
+const Post = mongoose.model("Post", PostSchema);
+
+module.exports = Post;

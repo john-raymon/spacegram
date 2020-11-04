@@ -6,7 +6,7 @@ const PostSchema = mongoose.Schema({
   description: String,
   deleted: Boolean,
   format: String,
-  files: {
+  file: {
     type: Map,
     default: new Map()
   },
@@ -16,7 +16,7 @@ PostSchema.methods.jsonSerialize = function() {
   const {
     id,
     title,
-    files,
+    file,
     deleted,
     description,
   } = this;
@@ -24,7 +24,7 @@ PostSchema.methods.jsonSerialize = function() {
   return {
     id,
     title,
-    files,
+    file,
     deleted,
     description,
   };

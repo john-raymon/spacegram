@@ -25,4 +25,7 @@ router.post('/', middleware.sessionRequireUser, ...service.create);
 // Read a post, only giving authorization to the
 router.get('/:postId', middleware.sessionRequireUser, ...service.read);
 
+// Delete a post, and remove it's file from Cloudinary
+router.delete('/:postId', middleware.sessionRequireUser, ...service.delete)
+
 module.exports = router;

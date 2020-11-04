@@ -10,7 +10,8 @@ const Post = require('@/models/Post');
  * utils
  */
 const isBodyMissingProps = require('@/utils/isBodyMissingProps');
-const multerCloudinaryMiddleware = require("@/middleware/multerCloudinary");
+const { multerMiddleware: multerCloudinaryMiddleware, cloudinary } = require("@/middleware/multerCloudinary");
+const { post } = require('../app');
 
 module.exports = {
   /**
@@ -45,12 +46,10 @@ module.exports = {
         user: req.user.id,
         title: req.body.title,
         description: req.body.description,
-        files: {
-          [req.file.filename]: {
+        file: {
             url: req.file.path,
             public_id: req.file.filename,
             ...req.file,
-          }
         }
       });
 
@@ -59,5 +58,37 @@ module.exports = {
       })
       .catch(next)
     },
+  ],
+  delete: [
+    (req, res, next) => {
+      // only give authorization to user of post
+      if (req.user.id !== req.post.user.id) {
+        return next({
+          name: "ForbiddenError",
+        })
+      }
+      req.post.deleted = true;
+      const public_id = req.post.file.get('filename');
+      return cloudinary.uploader.destroy(public_id, { type: 'upload', resource_type: req.post.file.get("mimetype").split('/')[0] }, (error, _res) => {
+        if (error || _res.result !== 'ok') {
+          return next(error || Error("We weren't able to delete this post right now."));
+        }
+        req.post.file = {
+          "public_id": null,
+          "url": null,
+          "originalname": null,
+          "fieldname": null,
+          "encoding": null,
+          "mimetype": null,
+          "size": null,
+          "filename": null,
+          "path": null,
+        }
+        return req.post.save().then((post) => {
+          return res.json({ success: true, post: post.jsonSerialize() });
+        })
+      })
+      // multerCloudinaryMiddleware.
+    }
   ]
 }

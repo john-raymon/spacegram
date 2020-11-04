@@ -12,7 +12,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "beta-onlyinsta",
-    allowedFormats: ['mp4', 'ogv', 'jpg', 'pdf', 'mov', '3gpp', 'avi', 'wmv', 'm3u8'],
+    allowedFormats: ['mp4', 'ogv', 'jpg', 'png', 'pdf', 'mov', '3gpp', 'avi', 'wmv', 'm3u8'],
     resource_type: "auto",
     transformation: { width: 0.7, quality: 70 },
   }
@@ -20,4 +20,4 @@ const storage = new CloudinaryStorage({
 
 const multerMiddleware = multer({ storage });
 
-module.exports = multerMiddleware;
+module.exports = { multerMiddleware, cloudinary };

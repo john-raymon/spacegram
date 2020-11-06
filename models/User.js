@@ -4,6 +4,12 @@ const uniqueValidator = require("mongoose-unique-validator");
 const config = require('config');
 const secret = config.get('app.secret');
 
+
+/**
+ * TODO: add support unique user created names
+ * to allow for easy linking
+ * TODO: add support for user images to be included within a user profile object
+ */
 const UserSchema = new mongoose.Schema(
   {
     email: {
@@ -37,7 +43,11 @@ const UserSchema = new mongoose.Schema(
     },
     salt: String,
     hash: String,
-    suspended: { type: Boolean, default: false }
+    suspended: { type: Boolean, default: false },
+    stripeExpressUserId: String,
+    randomKey: { type: String, index: true },
+    suspendedCreator: Boolean,
+    monthlySubscriptionPriceInCents: { type: Number, default: '1000'},
   },
   { timestamps: true }
 );
@@ -51,6 +61,15 @@ UserSchema.methods.setPassword = function(password) {
   this.hash = crypto
     .pbkdf2Sync(password, this.salt, 10000, 512, "sha512")
     .toString("hex");
+};
+
+UserSchema.methods.createRandomKey = function() {
+  crypto.randomBytes(48, (err, buffer) => {
+    this.randomKey = buffer.toString("hex");
+  });
+  return this.save().then(() => {
+    return this.randomKey;
+  });
 };
 
 UserSchema.methods.validPassword = function(password) {

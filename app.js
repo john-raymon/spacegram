@@ -74,7 +74,7 @@ app.use(express.static('./client/dist'));
 app.use('/api', require('./routes/api'));
 
 app.get("/*", function(req, res) {
-  return res.sendFile("./client/public/index.html");
+  return res.sendFile("./client/public/index.html", { root: __dirname });
 });
 
 // catch 404 and forward to error handler

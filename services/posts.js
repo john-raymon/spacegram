@@ -20,8 +20,8 @@ module.exports = {
     (req, res, next) => {
       /**
        * - get all subscriptions belonging to logged in user,
-       * meaning get all creator id's from subscriptions not expired,
-       * with user listed as subscriber
+       * meaning get all subscriptions with creator id's, not expired,
+       * and with the user listed as subscriber
        * - if only subscribed to one user do not use $or operator
        * in post query, if greater than 1 then query use the $or to select post documents with at least
        * one of the id's, along with a sorting of -1 on the created on date to

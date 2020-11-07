@@ -324,7 +324,7 @@ module.exports = {
         requiredProps,
         req.body
       );
-      debugger;
+
       if (hasMissingProps) {
         return next({
           name: "ValidationError",

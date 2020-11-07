@@ -4,7 +4,6 @@ const uniqueValidator = require("mongoose-unique-validator");
 const config = require('config');
 const secret = config.get('app.secret');
 
-
 /**
  * TODO: add support unique user created names
  * to allow for easy linking

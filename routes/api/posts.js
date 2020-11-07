@@ -19,6 +19,8 @@ router.param(":postId", function(req, res, next, postId) {
     .catch(next);
 });
 
+router.get('/feed', middleware.sessionRequireUser, ...service.getPostFeed)
+
 // Create a post, uploading a video/image file to Cloudinary
 router.post('/', middleware.sessionRequireUser, ...service.create);
 

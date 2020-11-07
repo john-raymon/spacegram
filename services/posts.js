@@ -6,6 +6,8 @@ const config = require('config');
  * models
  */
 const Post = require('@/models/Post');
+const Subscription = require('@/models/Subscription');
+
 /**
  * utils
  */
@@ -14,6 +16,44 @@ const { multerMiddleware: multerCloudinaryMiddleware, cloudinary } = require("@/
 const { post } = require('../app');
 
 module.exports = {
+  getPostFeed: [
+    (req, res, next) => {
+      /**
+       * - get all subscriptions belonging to logged in user,
+       * meaning get all creator id's from subscriptions not expired,
+       * with user listed as subscriber
+       * - if only subscribed to one user do not use $or operator
+       * in post query, if greater than 1 then query use the $or to select post documents with at least
+       * one of the id's, along with a sorting of -1 on the created on date to
+       *
+       */
+      return Subscription.find({
+          subscriber: req.user.id,
+          expires: {
+            $gte: new Date(),
+          }
+        })
+        .exec()
+        .then((following) => {
+          if (!following.length) {
+            return res.json({
+              success: true,
+              message: "You're not subscribed to any creators.",
+              postFeed: [],
+            })
+          }
+          const postFindQuery = following.length > 1 ? ({ $or: following.map(s => ({ user: s.creator })) }) : ({  user: following[0].creator });
+          return Post.find(postFindQuery).sort({ "createdAt": -1 }).populate('user', ['username', 'id', 'firstName', 'lastName'])
+          .exec()
+            .then((posts) => {
+              return res.json({
+                success: true,
+                postFeed: posts,
+              })
+            });
+        }).catch(next);
+    },
+  ],
   /**
    * TODO: add ability for followers to have access to the read
    * post endpoint for a user they follow.

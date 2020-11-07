@@ -1,7 +1,10 @@
 <template>
   <div class="default-layout">
-    <nav>
-      <ul>
+    <nav class="flex items-center p-8">
+      <router-link to="/" class="w-32">
+          <OnlyInstaLogo />
+      </router-link>
+      <ul class="flex justify-end w-full space-x-2">
         <template v-if="userAuth.isAuth">
           <li>
             <router-link to="/secure">
@@ -40,10 +43,14 @@
 </template>
 
 <script>
+import OnlyInstaLogo from "@/assets/svgs/onlyinsta-logo-svg.svg";
 
 export default {
   name: "DefaultLayout",
   props: ['userAuth'],
+  components: {
+    OnlyInstaLogo,
+  },
 };
 </script>
 <style lang="scss">
@@ -52,7 +59,7 @@ body {
   @apply bg-gray-100;
 }
 .default-layout {
-  @apply h-full max-w-screen-lg mx-auto px-2 bg-gray-100;
+  @apply h-full mx-auto px-2 bg-gray-100 onlyinsta-background-gradient;
   .main {
     @apply flex;
     min-height: calc(100vh - 6.25rem); // 6.25rem is the height of the footer in this layout

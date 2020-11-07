@@ -8,6 +8,7 @@ const config = require('config');
  */
 const User = require('@/models/User');
 const Subscription = require('@/models/Subscription');
+const Post = require('@/models/Post');
 
 /**
  * utils
@@ -27,6 +28,42 @@ const crypto = require("crypto");
  * TODO: Require users to connect to express before viewing orders/subscriptions
  */
 module.exports = {
+  getAllPostsForACreator: [
+    (req, res, next) => {
+      // authorize only the creator or a subscriber
+      const getAllCreatorPost = () => Post.find({
+        user: req.creatorUser.id,
+      }).exec().then((posts) => ({ success: true, posts, creator: { firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || 'unknown' }}));
+      if (req.creatorUser.id === req.user.id) {
+        // return creator posts to creator
+        return getAllCreatorPost().then((postRes) => {
+          return res.json(postRes)
+        });
+      } else {
+        // find an active subscription to allow access to the creators posts
+        return Subscription
+          .findOne({
+            subscriber: req.user.id,
+            creator: req.creatorUser.id,
+            expires: {
+              $gte: new Date(),
+            }
+          })
+          .then((subscription) => {
+            if (!subscription) {
+              return next({ name: "ForbiddenError" })
+            }
+            return getAllCreatorPost().then((postRes) => {
+              return res.json(postRes)
+            })
+          })
+          .catch(() => next({ name: "ForbiddenError" }))
+      }
+      /**
+       * TODO: add pagination support in later version
+       */
+    },
+  ],
   aggregateFollowersFollowingList: [
     (req, res, next) => {
       return Promise.all([
@@ -35,13 +72,13 @@ module.exports = {
           expires: {
             $gte: new Date(),
           }
-        }).exec(),
+        }).populate('creator', ['username', 'id', 'firstName', 'lastName']).exec(),
         Subscription.find({
           creator: req.user.id,
           expires: {
             $gte: new Date(),
           }
-        }).exec(),
+        }).populate('subscriber', ['username', 'id', 'firstName', 'lastName']).exec(),
       ]).then(([following, followers]) => {
         // TODO: serialize the subscription objects using getSubscriptionObject
         /**
@@ -278,14 +315,16 @@ module.exports = {
     function(req, res, next) {
       const requiredProps = [
         ['email', 'Your email is required'],
-        ['password', 'A password is required']
+        ['password', 'A password is required'],
+        ['username', 'A unique username is required'],
+        ['firstName', 'Your first name is required'],
+        ['lastName', 'Your last name is required']
       ];
-
       const { hasMissingProps, propErrors } = isBodyMissingProps(
         requiredProps,
         req.body
       );
-
+      debugger;
       if (hasMissingProps) {
         return next({
           name: "ValidationError",
@@ -298,23 +337,9 @@ module.exports = {
         firstName,
         lastName,
         password,
-        billingAddressLine,
-        billingCity,
-        billingState,
-        billingPostalCode,
-        billingCountry,
-        phoneNumber,
+        username,
       } = req.body;
 
-      const billing = {
-        address: {
-          line1: billingAddressLine,
-          city: billingCity,
-          state: billingState,
-          postal_code: billingPostalCode,
-          country: billingCountry,
-        },
-      };
       // check if user email is unique
       return User.count({ email })
         .exec()
@@ -334,8 +359,7 @@ module.exports = {
             email,
             firstName,
             lastName,
-            phoneNumber,
-            billingAddress: billing.address,
+            username,
           });
 
           user.setPassword(password);
@@ -346,6 +370,33 @@ module.exports = {
             })
         })
         .catch(next);
+    },
+  ],
+  /**
+   * update
+   */
+  update: [
+    (req, res, next) => {
+      const whitelistedKeys = ["email", "username", "password", "firstName", "lastName"];
+
+      for (const prop in req.body) {
+        if (whitelistedKeys.includes(prop) && prop !== "password") {
+          req.user[prop] = req.body[prop];
+        }
+      }
+      if (req.body.password) {
+        // TODO: send security email to user
+        req.user.setPassword(req.body.password);
+      }
+      return req.user
+      .save()
+      .then(function(user) {
+        return res.json({
+          success: true,
+          user: user.authSerialize()
+        });
+      })
+      .catch(next);
     },
   ],
   /**
@@ -375,7 +426,7 @@ module.exports = {
         user.lastLoginAt = Date.now();
         return user.save().then(() => {
           return req.login(user, () => res.json({ success: true, user: user.authSerialize() }));
-        })
+        }).catch(next);
       })(req, res, next);
     },
   ],

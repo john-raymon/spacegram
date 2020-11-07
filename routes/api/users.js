@@ -22,11 +22,17 @@ router.param(':creatorUserId', function(req, res, next, creatorUserId) {
 
 router.post('/', ...service.create);
 
+// update a user
+router.patch('/', middleware.sessionRequireUser, ...service.update)
+
 router.get('/', middleware.sessionRequireUser, function(req, res, next) {
   return res.json({
     user: req.user.authSerialize(),
   })
 });
+
+// fetch all of creator user's post, authorizing only the creator or a subscriber user
+router.get('/:creatorUserId/posts', middleware.sessionRequireUser, ...service.getAllPostsForACreator)
 
 // subscribe to a creator, sending over a stripe token
 router.post('/:creatorUserId/subscribe', middleware.sessionRequireUser, ...service.subscribeToAUser);

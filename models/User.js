@@ -12,13 +12,22 @@ const secret = config.get('app.secret');
  */
 const UserSchema = new mongoose.Schema(
   {
+    username: {
+      type: String,
+      lowercase: true,
+      unique: true,
+      index: true,
+      required: [true, "is required"],
+      default: () => (`user${crypto.randomBytes(4).toString("hex")}`),
+      match: [/^(?=[a-zA-Z0-9._]{4,12}$)(?!.*[_.]{2})[^_.].*[^_.]$/, "is invalid, it must be atleast four characters long with no special characters, only numbers and letters."],
+    },
     email: {
       type: String,
       lowercase: true,
       unique: true,
       index: true,
       required: [true, "is required"],
-      match: [/\S+@\S+\.\S+/, "is invalid"]
+      match: [/\S+@\S+\.\S+/, "is invalid."]
     },
     lastLoginAt: Date,
     isEmailConfirmed: {
@@ -86,9 +95,8 @@ UserSchema.methods.authSerialize = function() {
     firstName: this.firstName,
     lastName: this.lastName,
     isEmailConfirmed: this.isEmailConfirmed,
-    billing: this.billing,
-    phoneNumber: this.phoneNumber,
     lastLoginAt: new Date(this.lastLoginAt).toUTCString(),
+    username: this.username,
   };
 };
 

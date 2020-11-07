@@ -55,7 +55,7 @@ export default {
     userAuth: {
       handler(val) {
         if (val.isAuth) {
-          const redirectRouteName = this.$route.query.redirect || "home";
+          const redirectRouteName = this.$route.query.redirect || "timeline";
           return this.$router.push({ name: redirectRouteName, query: this.$route.query });
         }
       },

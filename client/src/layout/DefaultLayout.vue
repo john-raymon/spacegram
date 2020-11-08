@@ -1,8 +1,8 @@
 <template>
   <div class="default-layout">
-    <nav class="sticky top-0 w-full bg-pink-light">
-      <div class="flex items-center px-4 py-6 max-w-screen-lg mx-auto">
-        <router-link to="/" class="w-48">
+    <nav class="sticky top-0 w-full text-white">
+      <div class="flex items-center px-4 py-8 max-w-screen-lg mx-auto">
+        <router-link to="/" class="w-48 text-white fill-current">
             <OnlyInstaLogo />
         </router-link>
         <ul class="flex justify-end w-full space-x-2">
@@ -26,11 +26,10 @@
     <main class="main">
       <slot />
     </main>
-    <div v-if="userAuth.isAuth" class="bg-white shadow-2xl w-full py-8 bottom-0 sticky">
-      <p> controls go here </p>
-      <p> controls go here </p>
-      <p> controls go here </p>
-      <p> controls go here </p>
+    <div class="bottom-0 sticky p-6 md:p-12">
+      <div v-if="userAuth.isAuth" class="p-2 md:p-4 bg-red-100 rounded-full text-white shadow-2xl w-full">
+        <p> controls go here </p>
+      </div>
     </div>
   </div>
 </template>
@@ -52,7 +51,7 @@ body {
   @apply bg-gray-100;
 }
 .default-layout {
-  @apply h-full mx-auto bg-gray-100 onlyinsta-background-gradient w-full;
+  @apply h-full mx-auto bg-gray-oi w-full;
   .main {
     @apply flex max-w-screen-lg px-4 mx-auto;
     min-height: calc(100vh - 6.25rem); // 6.25rem is the height of the footer in this layout

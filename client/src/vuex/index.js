@@ -31,11 +31,11 @@ export default new Vuex.Store({
       context.commit("setUserAuth", authData);
     },
     logout(context) {
-        const $http = new Agent('/api');
-        $http._get('/users/logout').then(() => {
+      const $http = new Agent('/api');
+      $http._get('/users/logout').then(() => {
         return context.commit("resetAuth");
-      })
-    }
+      });
+    },
   },
   plugins: [persist.plugin]
 });

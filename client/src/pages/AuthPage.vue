@@ -57,8 +57,8 @@
 
       <div class="text-gray-dark mt-6">
         Already have an account?
-        <router-link class="no-underline border-b border-blue-500 text-blue-500" to="/login">
-          Log in
+        <router-link class="no-underline border-b border-blue-500 text-blue-500" to="/sign-in">
+          Sign in here
         </router-link>
       </div>
     </div>

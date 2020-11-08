@@ -15,14 +15,17 @@ export default {
     },
     ...mapState(["userAuth"])
   },
+  watch: {
+    userAuth(val, oldVal) {
+      if (!val.isAuth && val.isAuth !== oldVal.isAuth) {
+        return this.$router.push({ name: 'home' });
+      };
+    },
+  },
   methods: {
     ...mapActions(['logout']),
     handleLogout() {
-      this.logout().then(() => {
-        this.$nextTick().then(() => {
-          this.$router.push({ name: 'sign-in' });
-        })
-      });
+      this.logout();
     }
   }
 };

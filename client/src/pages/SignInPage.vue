@@ -1,16 +1,10 @@
 <template>
-  <div class="mt-32 w-full flex items-center flex-col">
+  <div class="mt-32 w-full flex items-center flex-col text-white">
     <!-- TODO: add to this component ability to toggle into merchant sign in -->
     <div class="container max-w-md mx-auto flex flex-col items-center justify-center px-2">
       <div class="bg-white px-6 py-6 rounded shadow-md text-black w-full">
         <h1 class="tracking-wide pb-6 text-center text-gray-800">Sign in as a user</h1>
-        <input
-          type="text"
-          class="text-field"
-          name="email"
-          placeholder="Email"
-          v-model="email"
-        />
+        <input type="text" class="text-field" name="email" placeholder="Email" v-model="email" />
 
         <input
           type="password"
@@ -20,20 +14,15 @@
           v-model="password"
         />
 
-        <button
-          type="submit"
-          class="button w-full"
-          @click="onSubmit"
-        >
+        <button type="submit" class="button w-full" @click="onSubmit">
           Sign In
         </button>
-
       </div>
 
       <div class="text-gray-dark mt-6 tracking-wider text-sm">
-        Don't have an account?
+        Don't have an OnlyInsta account?
         <router-link class="no-underline border-b border-blue-500 text-blue-500" to="/sign-up">
-          Sign up here
+          Sign up for free here
         </router-link>
       </div>
     </div>
@@ -44,7 +33,7 @@ import { mapActions } from "vuex";
 
 export default {
   name: "SignInPage",
-  props: ['userAuth'],
+  props: ["userAuth"],
   data() {
     return {
       email: "",
@@ -56,10 +45,14 @@ export default {
       handler(val) {
         if (val.isAuth) {
           const redirectRouteName = this.$route.query.redirect || "timeline";
-          return this.$router.push({ name: redirectRouteName, query: this.$route.query });
+          return this.$router.push({
+            name: redirectRouteName,
+            query: { ...this.$route.query, redirectParams: undefined, redirect: undefined },
+            params: this.$route.query.redirectParams && JSON.parse(this.$route.query.redirectParams)
+          });
         }
       },
-      immediate: true,
+      immediate: true
     }
   },
   methods: {
@@ -76,7 +69,7 @@ export default {
         .catch(err => {
           if (err.response) {
             console.log("Error when attempting to login user", err, err.response);
-            return alert(JSON.stringify(err.response.data));
+            return alert("Invalid email or password");
           }
         });
     }

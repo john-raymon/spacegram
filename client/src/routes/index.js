@@ -2,6 +2,7 @@ import VueRouter from "vue-router";
 import AuthPage from "@/pages/AuthPage";
 import TimelineHomepage from "@/pages/TimelineHomepage";
 import SignInPage from "@/pages/SignInPage";
+import CreatorProfilePage from "@/pages/CreatorProfilePage";
 import store from "@/vuex";
 
 const routes = [
@@ -19,6 +20,14 @@ const routes = [
     }
   },
   {
+    name: "creator-profile",
+    path: "/creator/:id",
+    component: CreatorProfilePage,
+    meta: {
+      requireUserAuth: true
+    }
+  },
+  {
     name: "sign-up",
     path: "/sign-up",
     component: AuthPage
@@ -26,7 +35,7 @@ const routes = [
   {
     name: "sign-in",
     path: "/sign-in",
-    component: SignInPage,
+    component: SignInPage
   },
   {
     name: "secure",
@@ -47,12 +56,20 @@ const routes = [
 
 const router = new VueRouter({
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else {
+      return { x: 0, y: 0 };
+    }
+  },
   mode: "history"
 });
 
 router.beforeEach(async (to, from, next) => {
   const isUserAuth = store.state.userAuth.isAuth;
-  if (to.name === 'home' && isUserAuth) { // when logged in, redirect to timeline-homepage, not sign-in/sign-up homepage
+  if (to.name === "home" && isUserAuth) {
+    // when logged in, redirect to timeline-homepage, not sign-in/sign-up homepage
     return next({
       name: "timeline"
     });
@@ -63,7 +80,7 @@ router.beforeEach(async (to, from, next) => {
     if (!isUserAuth) {
       return next({
         name: "sign-in",
-        query: { ...to.query, redirect: to.name }
+        query: { ...to.query, redirect: to.name, redirectParams: JSON.stringify(to.params) }
       });
     } else {
       return next();

@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@babel/core": "^7.10.4",
-    "@stripe/stripe-js": "^1.7.0",
+    "@stripe/stripe-js": "^1.11.0",
     "@vue/cli-plugin-babel": "~4.4.0",
     "@vue/cli-plugin-eslint": "~4.4.0",
     "@vue/cli-service": "~4.4.0",

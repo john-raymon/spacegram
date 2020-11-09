@@ -18,12 +18,12 @@ export default {
   watch: {
     userAuth(val, oldVal) {
       if (!val.isAuth && val.isAuth !== oldVal.isAuth) {
-        return this.$router.push({ name: 'home' });
-      };
-    },
+        return this.$router.push({ name: "home" });
+      }
+    }
   },
   methods: {
-    ...mapActions(['logout']),
+    ...mapActions(["logout"]),
     handleLogout() {
       this.logout();
     }

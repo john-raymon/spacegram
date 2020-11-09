@@ -10,7 +10,26 @@
           @<span class="capitalize">{{ creator.username }}</span>
         </p>
       </div>
-      <p class="text-red-300 text-sm md:text-lg">
+      <div v-if="stats">
+        <div class="flex space-x-6 text-red-100 text-sm md:text-lg">
+        <router-link to="/subscribers" class="text-6xl leading-none font-bold text-center">
+          {{ stats.followers.length }}
+          <span class="text-xs text-center block font-light">
+            Subscribers
+          </span>
+        </router-link>
+        <router-link to="/following" class="text-6xl leading-none font-bold text-center">
+          {{ stats.following.length }}
+          <span class="text-xs text-center block font-light">
+            Following
+          </span>
+        </router-link>
+        </div>
+        <p class="text-xs text-center py-2 opacity-50">
+          (only you can see this)
+        </p>
+      </div>
+      <p v-else-if="following && subscription" class="text-red-300 text-sm md:text-lg">
         <template v-if="following && subscription">
           Your subscription for this page expires on <span class="capitalize">{{ formattedExpDate }}</span>
         </template>
@@ -63,7 +82,7 @@
   </div>
 </template>
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 import { loadStripe } from "@stripe/stripe-js";
 
 export default {
@@ -75,6 +94,7 @@ export default {
       posts: [],
       subscribeError: "",
       subscription: null,
+      stats: null
     };
   },
   // handles setting Stripe.js #card-element when mounted on DOM
@@ -93,6 +113,7 @@ export default {
     this.fetchPost();
   },
   computed: {
+    ...mapState(["userAuth"]),
     formattedExpDate() {
       const options = { year: "numeric", month: "long", day: "numeric" }
       return new Date(this.subscription.expires).toLocaleDateString(undefined, options)
@@ -104,17 +125,30 @@ export default {
       // fetch post feed
       this.$http
         ._get(`/users/${this.$route.params.id}/posts`)
-        .then(res => {
+        .then(function(res) {
           if (res.success) {
             this.following = true;
             this.creator = res.creator;
             this.subscription = res.subscription;
             this.posts = res.posts.filter(p => !p.deleted);
+            // TODO: store this date globally, so that we can reuse the other computed data dervived
+            // from this for other views, instead of making the same request against
+            // check if logged-in user's creator-profile, if so, fetch follower, following count
+            if (this.userAuth.user.id === res.creator.id) {
+              // fetch follower count;
+              return this.$http._get('/users/followers-following')
+                .then((res) => {
+                  this.stats = {
+                    following: res.following,
+                    followers: res.followers,
+                  };
+                })
+            }
           }
           if (res.creator) {
             this.creator = res.creator;
           }
-        })
+        }.bind(this))
         .catch(error => {
           if (error && error.response && error.response.status === 401) {
             this.logout();
@@ -143,7 +177,6 @@ export default {
           // continue and make request to subscribe endpoint
         })
         .catch(error => {
-          debugger;
           if (error && error.response && error.response.status === 401) {
             this.logout();
           }

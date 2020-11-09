@@ -1,7 +1,7 @@
 <template>
   <div class="default-layout">
     <nav class="transparent-background-shadow sticky top-0 w-full text-white z-50 px-6">
-      <div class="flex items-center px-4 py-10 max-w-screen-lg mx-auto">
+      <div class="flex items-center px-4 pt-10 max-w-screen-lg mx-auto">
         <router-link to="/" class="w-48 text-white fill-current">
           <OnlyInstaLogo />
         </router-link>
@@ -75,8 +75,8 @@ body {
   @apply h-full mx-auto w-full;
   background-color: #131313;
   .main {
-    @apply flex max-w-screen-lg px-6 mx-auto;
-    min-height: calc(100vh - 6.25rem); // 6.25rem is the height of the footer in this layout
+    @apply flex max-w-screen-lg px-6 py-4 mx-auto;
+    min-height: calc(100vh); // 6.25rem is the height of the footer in this layout
   }
 }
 </style>

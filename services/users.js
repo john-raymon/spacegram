@@ -33,7 +33,7 @@ module.exports = {
       // authorize only the creator or a subscriber
       const getAllCreatorPost = () => Post.find({
         user: req.creatorUser.id,
-      }).exec().then((posts) => ({ monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, success: true, posts, creator: { firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || 'unknown' }}));
+      }).exec().then((posts) => ({ monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, success: true, posts, creator: { firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || '', id: req.creatorUser.id }}));
       if (req.creatorUser.id === req.user.id) {
         // return creator posts to creator
         return getAllCreatorPost().then((postRes) => {
@@ -51,7 +51,7 @@ module.exports = {
           })
           .then((subscription) => {
             if (!subscription) {
-              return res.json({ creator: { monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || 'unknown' }, name: "ForbiddenError" })
+              return res.json({ creator: { monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || '', id: req.creatorUser.id, }, name: "ForbiddenError" })
             }
             return getAllCreatorPost().then((postRes) => {
               return res.json({...postRes, subscription })
@@ -72,13 +72,13 @@ module.exports = {
           expires: {
             $gte: new Date(),
           }
-        }).populate('creator', ['username', 'id', 'firstName', 'lastName']).exec(),
+        }).populate('subscriber', ['username', 'id']).populate('creator', ['username', 'id', 'firstName', 'lastName']).exec(),
         Subscription.find({
           creator: req.user.id,
           expires: {
             $gte: new Date(),
           }
-        }).populate('subscriber', ['username', 'id', 'firstName', 'lastName']).exec(),
+        }).populate('creator', ['username', 'id']).populate('subscriber', ['username', 'id', 'firstName', 'lastName']).exec(),
       ]).then(([following, followers]) => {
         // TODO: serialize the subscription objects using getSubscriptionObject
         /**

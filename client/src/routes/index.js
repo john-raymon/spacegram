@@ -3,6 +3,7 @@ import AuthPage from "@/pages/AuthPage";
 import TimelineHomepage from "@/pages/TimelineHomepage";
 import SignInPage from "@/pages/SignInPage";
 import CreatorProfilePage from "@/pages/CreatorProfilePage";
+import PostDetailPage from '@/pages/PostDetailPage';
 import store from "@/vuex";
 
 const routes = [
@@ -26,6 +27,15 @@ const routes = [
     meta: {
       requireUserAuth: true
     }
+  },
+  {
+    name: "post-detail",
+    path: '/post/:id',
+    alias: '/posts/:id',
+    component: PostDetailPage,
+    meta: {
+      requireUserAuth: true,
+    },
   },
   {
     name: "sign-up",

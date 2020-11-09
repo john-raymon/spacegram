@@ -33,7 +33,7 @@ module.exports = {
       // authorize only the creator or a subscriber
       const getAllCreatorPost = () => Post.find({
         user: req.creatorUser.id,
-      }).exec().then((posts) => ({ success: true, posts, creator: { firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || 'unknown' }}));
+      }).exec().then((posts) => ({ monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, success: true, posts, creator: { firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || 'unknown' }}));
       if (req.creatorUser.id === req.user.id) {
         // return creator posts to creator
         return getAllCreatorPost().then((postRes) => {
@@ -51,10 +51,10 @@ module.exports = {
           })
           .then((subscription) => {
             if (!subscription) {
-              return next({ name: "ForbiddenError" })
+              return res.json({ creator: { monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || 'unknown' }, name: "ForbiddenError" })
             }
             return getAllCreatorPost().then((postRes) => {
-              return res.json(postRes)
+              return res.json({...postRes, subscription })
             })
           })
           .catch(() => next({ name: "ForbiddenError" }))

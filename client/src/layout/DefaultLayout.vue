@@ -8,7 +8,7 @@
         <ul class="flex justify-end w-full space-x-4">
           <template v-if="userAuth.isAuth">
             <li>
-              <router-link to="/creator/me">
+              <router-link @click.prevent="$route.$forceUpdate" :to="`/creator/${userAuth.user.id}`">
                 Profile
               </router-link>
             </li>
@@ -73,7 +73,7 @@ body {
 }
 .default-layout {
   @apply h-full mx-auto w-full;
-  background-color: #212121;
+  background-color: #131313;
   .main {
     @apply flex max-w-screen-lg px-6 mx-auto;
     min-height: calc(100vh - 6.25rem); // 6.25rem is the height of the footer in this layout

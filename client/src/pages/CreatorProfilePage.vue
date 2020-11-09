@@ -2,7 +2,7 @@
   <div class="pb-6 mx-auto text-white w-full px-4">
     <div v-if="creator" class="flex  justify-between items-center py-2 pb-4 mb-4 mx-auto space-x-4">
       <div class="flex items-center flex-wrap md:space-x-4">
-        <div class="w-32 h-auto bg-red-200 rounded-full mb-2">
+        <div class="w-32 h-auto bg-red-200 rounded-full mb-2 mr-2">
           <div class="w-full padding-bottom-full rounded-full bg-red-200">
           </div>
         </div>
@@ -10,12 +10,9 @@
           @<span class="capitalize">{{ creator.username }}</span>
         </p>
       </div>
-      <p class="text-red-300 text-lg">
-        <template v-if="following">
-          Your subscription expires on <span class="capitalize">{{ formattedExpDate }}</span>
-        </template>
-        <template v-else>
-          You're not subscribed to @{{ creator && creator.username }}'s page.
+      <p class="text-red-300 text-sm md:text-lg">
+        <template v-if="following && subscription">
+          Your subscription for this page expires on <span class="capitalize">{{ formattedExpDate }}</span>
         </template>
       </p>
     </div>
@@ -77,13 +74,20 @@ export default {
       creator: null,
       posts: [],
       subscribeError: "",
-      subscription: {}
+      subscription: null,
     };
   },
   // handles setting Stripe.js #card-element when mounted on DOM
   mounted() {
     this.setUpStripeElementCard();
   },
+  // beforeRouteUpdate(to, from, next) {
+  //   debugger;
+  //   if (to.path !== from.path) {
+  //     debugger;
+  //     window.location = to.path;
+  //   }
+  // },
   created() {
     // fetch post feed
     this.fetchPost();

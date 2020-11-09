@@ -1,6 +1,6 @@
 <template>
   <component @log-out="handleLogout" :is="layout" :userAuth="userAuth">
-    <router-view :userAuth="userAuth" />
+    <router-view :key="$route.fullPath" :userAuth="userAuth" />
   </component>
 </template>
 

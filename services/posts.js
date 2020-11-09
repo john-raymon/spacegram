@@ -62,11 +62,24 @@ module.exports = {
     (req, res, next) => {
       // only give authorization to user of post
       if (req.user.id !== req.post.user.id) {
-        return next({
-          name: "ForbiddenError",
+        return Subscription.findOne({
+          creator: req.post.user.id,
+          subscriber: req.user.id,
+          expires: {
+            $gte: new Date(),
+          }
         })
+        .then((subscription) => {
+          if (!subscription) {
+            return next({
+              name: "ForbiddenError",
+            })
+          }
+          return res.json({ success: true, post: req.post, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '' } })
+        })
+        .catch(next)
       }
-      return res.json({ success: true, post: req.post.jsonSerialize() })
+      return res.json({ success: true, post: req.post, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '' } })
     },
   ],
   /**

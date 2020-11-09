@@ -13,7 +13,7 @@ export default new Vuex.Store({
     userAuth: {
       isAuth: false,
       user: null
-    },
+    }
   },
   mutations: {
     setUserAuth(state, userAuth) {
@@ -21,9 +21,9 @@ export default new Vuex.Store({
     },
     resetAuth(state) {
       state.userAuth = {
-          isAuth: false,
-          user: null
-        };
+        isAuth: false,
+        user: null
+      };
     }
   },
   actions: {
@@ -31,11 +31,11 @@ export default new Vuex.Store({
       context.commit("setUserAuth", authData);
     },
     logout(context) {
-      const $http = new Agent('/api');
-      $http._get('/users/logout').then(() => {
+      const $http = new Agent("/api");
+      $http._get("/users/logout").then(() => {
         return context.commit("resetAuth");
       });
-    },
+    }
   },
   plugins: [persist.plugin]
 });

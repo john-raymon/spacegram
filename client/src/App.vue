@@ -1,6 +1,6 @@
 <template>
   <component @log-out="handleLogout" :is="layout" :userAuth="userAuth">
-    <router-view :userAuth="userAuth" />
+    <router-view :key="$route.fullPath" :userAuth="userAuth" />
   </component>
 </template>
 
@@ -18,12 +18,12 @@ export default {
   watch: {
     userAuth(val, oldVal) {
       if (!val.isAuth && val.isAuth !== oldVal.isAuth) {
-        return this.$router.push({ name: 'home' });
-      };
-    },
+        return this.$router.push({ name: "home" });
+      }
+    }
   },
   methods: {
-    ...mapActions(['logout']),
+    ...mapActions(["logout"]),
     handleLogout() {
       this.logout();
     }

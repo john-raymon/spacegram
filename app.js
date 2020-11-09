@@ -39,7 +39,7 @@ app.use(session({
     httpOnly: true,
     secure: isProduction,
     sameSite: true,
-    maxAge: 600000,
+    maxAge: 1296000, // 15 days
   },
   resave: false,
 }));

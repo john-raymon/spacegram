@@ -1,7 +1,7 @@
 module.exports = {
   theme: {
     fontFamily: {
-      elMessiri: ["El Messiri", "sans-serif"],
+      elMessiri: ["El Messiri", "sans-serif"]
     }
   },
   variants: {

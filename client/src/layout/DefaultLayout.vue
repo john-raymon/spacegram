@@ -9,7 +9,6 @@
           <template v-if="userAuth.isAuth">
             <li>
               <router-link
-                @click.prevent="$route.$forceUpdate"
                 :to="`/creator/${userAuth.user.id}`"
               >
                 Profile

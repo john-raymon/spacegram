@@ -31,13 +31,14 @@
     <main class="main">
       <slot />
     </main>
-    <div v-if="userAuth.isAuth" class="flex justify-center bottom-0 sticky pb-4 max-w-screen-lg mx-auto">
+    <div v-if="userAuth.isAuth && $route.name !== 'create-post'" class="flex justify-center bottom-0 sticky pb-4 max-w-screen-lg mx-auto">
       <div
         class="flex items-center justify-center px-2 py-2 md:py-2 px-6 bg-white rounded-full text-white shadow-2xl"
       >
         <ul class="flex space-x-4">
           <li class="flex">
-            <button
+            <router-link
+              to="/post/new"
               class="focus:outline-none leading-none flex flex-row items-center justify-center text-black p-1 hover:opacity-50"
             >
               <div class="flex flex-col justify-center items-center text-sm">
@@ -45,7 +46,7 @@
                   <UploadIcon />
                 </div>
               </div>
-            </button>
+            </router-link>
           </li>
         </ul>
       </div>

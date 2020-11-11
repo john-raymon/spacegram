@@ -6,6 +6,7 @@ import CreatorProfilePage from "@/pages/CreatorProfilePage";
 import PostDetailPage from '@/pages/PostDetailPage';
 import SubscribersPage from '@/pages/SubscribersPage';
 import FollowingPage from '@/pages/FollowingPage';
+import CreatePostPage from '@/pages/CreatePostPage';
 import store from "@/vuex";
 
 const routes = [
@@ -20,7 +21,15 @@ const routes = [
     component: TimelineHomepage,
     meta: {
       requireUserAuth: true
-    }
+    },
+  },
+  {
+    name: "create-post",
+    path: "/post/new/",
+    component: CreatePostPage,
+    meta: {
+      requireUserAuth: true,
+    },
   },
   {
     name: "following-list",

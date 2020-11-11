@@ -5,6 +5,7 @@ module.exports = {
     }
   },
   variants: {
-    transitionProperty: ["responsive", "hover", "focus"]
+    transitionProperty: ["responsive", "hover", "focus"],
+    borderWidth: ['responsive', 'hover', 'focus'],
   }
 };

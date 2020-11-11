@@ -14,7 +14,9 @@ class Agent {
     //   return config;
     // });
   }
-
+  static axios (...args) {
+    return this.axios(...args);
+  }
   // static getToken() {
   //   // gets the token from local-storage
   //   return localforage.getItem("jwt");
@@ -65,8 +67,8 @@ class Agent {
     return this.superagent.patch(`${this.API_ROOT}${url}`, body).then(this._responseBody);
   }
 
-  _post(url, body, fullPath = false) {
-    return axios.post(fullPath ? url : `${this.API_ROOT}${url}`, body).then(this._responseBody);
+  _post(url, body, fullPath = false, config) {
+    return axios.post(fullPath ? url : `${this.API_ROOT}${url}`, body, config).then(this._responseBody);
   }
 }
 

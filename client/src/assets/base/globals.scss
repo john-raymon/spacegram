@@ -1,3 +1,10 @@
+.filepond--root {
+  font-family: "El Messiri";
+  label {
+    @apply cursor-pointer;
+  }
+}
+
 .button {
   @apply
     bg-green-600

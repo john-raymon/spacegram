@@ -8,7 +8,10 @@
         <ul class="flex justify-end w-full space-x-4">
           <template v-if="userAuth.isAuth">
             <li>
-              <router-link @click.prevent="$route.$forceUpdate" :to="`/creator/${userAuth.user.id}`">
+              <router-link
+                @click.prevent="$route.$forceUpdate"
+                :to="`/creator/${userAuth.user.id}`"
+              >
                 Profile
               </router-link>
             </li>
@@ -31,7 +34,10 @@
     <main class="main">
       <slot />
     </main>
-    <div v-if="userAuth.isAuth && $route.name !== 'create-post'" class="flex justify-center bottom-0 sticky pb-4 max-w-screen-lg mx-auto">
+    <div
+      v-if="userAuth.isAuth && $route.name !== 'create-post'"
+      class="flex justify-center bottom-0 sticky pb-4 max-w-screen-lg mx-auto"
+    >
       <div
         class="flex items-center justify-center px-2 py-2 md:py-2 px-6 bg-white rounded-full text-white shadow-2xl"
       >
@@ -63,7 +69,7 @@ export default {
   props: ["userAuth"],
   components: {
     OnlyInstaLogo,
-    UploadIcon,
+    UploadIcon
   }
 };
 </script>

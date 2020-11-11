@@ -9,17 +9,38 @@
               :src="post.file.url"
               width="100%"
             />
-            <video v-else class="w-100" :src="post.file.url" controls>
-            </video>
+            <video v-else class="w-100" :src="post.file.url" controls></video>
           </div>
-          <div class="flex items-center px-8">
+          <!-- <div class="flex items-center px-8">
             <p class="mr-2 font-light text-xs">
               Created by
             </p>
-            <router-link :to="`/creator/${post.user._id}`" class="capitalize text-xs hover:opacity-75 font-black block flex items-center justify-center my-3 p-2 bg-red-200 cursor-pointer rounded-full w-12 h-12">
+            <router-link
+              :to="`/creator/${post.user._id}`"
+              class="capitalize text-xs hover:opacity-75 font-black block flex items-center justify-center my-3 p-2 bg-red-200 cursor-pointer rounded-full w-12 h-12"
+            >
               {{ post.user.username[0] }}
               {{ post.user.username[1] }}
             </router-link>
+          </div> -->
+          <div class="flex items-center justify-between px-8">
+            <p class="text-black text-sm pr-4">
+              {{
+                post.description
+              }}
+            </p>
+            <div class="flex items-center self-end">
+              <p class="mr-2 font-light text-xs">
+                Created by
+              </p>
+              <router-link
+                :to="`/creator/${post.user._id}`"
+                class="capitalize text-xs hover:opacity-75 font-black block flex items-center justify-center my-3 p-2 bg-red-200 cursor-pointer rounded-full w-12 h-12"
+              >
+                {{ post.user.username[0] }}
+                {{ post.user.username[1] }}
+              </router-link>
+            </div>
           </div>
         </div>
       </li>
@@ -33,30 +54,32 @@ export default {
   name: "TimelineHomepage",
   data() {
     return {
-      postFeed: [],
-    }
+      postFeed: []
+    };
   },
   created() {
     // fetch post feed
     this.$http
       ._get("/posts/feed")
-      .then((res) => {
+      .then(res => {
         if (res.success) {
           this.postFeed = res.postFeed.filter(p => !p.deleted);
-        };
-      })
-      .catch(function (error) {
-        if (error && error.response && error.response.status === 401) {
-          this.logout();
         }
-        // this.$emit('log-out');
-        // catch unauthenticated error logging out user
-        console.log('error while fetch post feed');
-      }.bind(this));
+      })
+      .catch(
+        function(error) {
+          if (error && error.response && error.response.status === 401) {
+            this.logout();
+          }
+          // this.$emit('log-out');
+          // catch unauthenticated error logging out user
+          console.log("error while fetch post feed");
+        }.bind(this)
+      );
   },
   methods: {
-    ...mapActions(['logout']),
-  },
+    ...mapActions(["logout"])
+  }
 };
 </script>
 <style lang="scss">

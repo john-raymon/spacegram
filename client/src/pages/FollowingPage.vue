@@ -8,16 +8,19 @@
     </p>
     <ul class="inline-flex flex-col space-y-2 w-auto mx-auto mt-6">
       <li v-for="subscription in subscriptions" :key="subscription.creator._id">
-        <router-link :to="`/creator/${subscription.creator._id}`" class="flex hover:opacity:75 focus:opacity-50 items-center text-black w-full p-1">
-            <div class="capitalize text-xs hover:opacity-75 text-left font-black block flex items-center justify-center my-3 p-2 bg-red-200 cursor-pointer rounded-full w-12 h-12">
-              {{ subscription.creator.username[0] }}
-              {{ subscription.creator.username[1] }}
-            </div>
-            <p class="text-lg text-white pl-4">
-              {{
-                subscription.creator.username
-              }}
-            </p>
+        <router-link
+          :to="`/creator/${subscription.creator._id}`"
+          class="flex hover:opacity:75 focus:opacity-50 items-center text-black w-full p-1"
+        >
+          <div
+            class="capitalize text-xs hover:opacity-75 text-left font-black block flex items-center justify-center my-3 p-2 bg-red-200 cursor-pointer rounded-full w-12 h-12"
+          >
+            {{ subscription.creator.username[0] }}
+            {{ subscription.creator.username[1] }}
+          </div>
+          <p class="text-lg text-white pl-4">
+            {{ subscription.creator.username }}
+          </p>
         </router-link>
       </li>
     </ul>
@@ -29,7 +32,7 @@ export default {
   name: "FollowingPage",
   data() {
     return {
-      subscriptions: [],
+      subscriptions: []
     };
   },
   created() {
@@ -39,14 +42,15 @@ export default {
   methods: {
     fetchFollowersFollowing() {
       // fetch follower count;
-      return this.$http._get('/users/followers-following')
-        .then((res) => {
+      return this.$http
+        ._get("/users/followers-following")
+        .then(res => {
           this.subscriptions = res.following;
         })
         .catch(() => {
-          console.log('error while fetching followers and following');
-        })
+          console.log("error while fetching followers and following");
+        });
     }
-  },
-}
+  }
+};
 </script>

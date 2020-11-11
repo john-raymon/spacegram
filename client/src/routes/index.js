@@ -3,9 +3,10 @@ import AuthPage from "@/pages/AuthPage";
 import TimelineHomepage from "@/pages/TimelineHomepage";
 import SignInPage from "@/pages/SignInPage";
 import CreatorProfilePage from "@/pages/CreatorProfilePage";
-import PostDetailPage from '@/pages/PostDetailPage';
-import SubscribersPage from '@/pages/SubscribersPage';
-import FollowingPage from '@/pages/FollowingPage';
+import PostDetailPage from "@/pages/PostDetailPage";
+import SubscribersPage from "@/pages/SubscribersPage";
+import FollowingPage from "@/pages/FollowingPage";
+import CreatePostPage from "@/pages/CreatePostPage";
 import store from "@/vuex";
 
 const routes = [
@@ -23,20 +24,28 @@ const routes = [
     }
   },
   {
+    name: "create-post",
+    path: "/post/new/",
+    component: CreatePostPage,
+    meta: {
+      requireUserAuth: true
+    }
+  },
+  {
     name: "following-list",
     path: "/following",
     component: FollowingPage,
     meta: {
-      requireUserAuth: true,
-    },
+      requireUserAuth: true
+    }
   },
   {
     name: "subscribers-list",
     path: "/subscribers",
     component: SubscribersPage,
     meta: {
-      requireUserAuth: true,
-    },
+      requireUserAuth: true
+    }
   },
   {
     name: "creator-profile",
@@ -48,12 +57,12 @@ const routes = [
   },
   {
     name: "post-detail",
-    path: '/post/:id',
-    alias: '/posts/:id',
+    path: "/post/:id",
+    alias: "/posts/:id",
     component: PostDetailPage,
     meta: {
-      requireUserAuth: true,
-    },
+      requireUserAuth: true
+    }
   },
   {
     name: "sign-up",

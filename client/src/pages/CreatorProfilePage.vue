@@ -3,8 +3,7 @@
     <div v-if="creator" class="flex  justify-between items-center py-2 pb-4 mb-4 mx-auto space-x-4">
       <div class="flex items-center flex-wrap md:space-x-4">
         <div class="w-32 h-auto bg-red-200 rounded-full mb-2 mr-2">
-          <div class="w-full padding-bottom-full rounded-full bg-red-200">
-          </div>
+          <div class="w-full padding-bottom-full rounded-full bg-red-200"></div>
         </div>
         <p class="text-red-200 text-sm md:text-lg">
           @<span class="capitalize">{{ creator.username }}</span>
@@ -12,18 +11,18 @@
       </div>
       <div v-if="stats">
         <div class="flex space-x-6 text-red-100 text-sm md:text-lg">
-        <router-link to="/subscribers" class="text-6xl leading-none font-bold text-center">
-          {{ stats.followers.length }}
-          <span class="text-xs text-center block font-light">
-            Subscribers
-          </span>
-        </router-link>
-        <router-link to="/following" class="text-6xl leading-none font-bold text-center">
-          {{ stats.following.length }}
-          <span class="text-xs text-center block font-light">
-            Following
-          </span>
-        </router-link>
+          <router-link to="/subscribers" class="text-6xl leading-none font-bold text-center">
+            {{ stats.followers.length }}
+            <span class="text-xs text-center block font-light">
+              Subscribers
+            </span>
+          </router-link>
+          <router-link to="/following" class="text-6xl leading-none font-bold text-center">
+            {{ stats.following.length }}
+            <span class="text-xs text-center block font-light">
+              Following
+            </span>
+          </router-link>
         </div>
         <p class="text-xs text-center py-2 opacity-50">
           (only you can see this)
@@ -31,7 +30,8 @@
       </div>
       <p v-else-if="following && subscription" class="text-red-300 text-sm md:text-lg">
         <template v-if="following && subscription">
-          Your subscription for this page expires on <span class="capitalize">{{ formattedExpDate }}</span>
+          Your subscription for this page expires on
+          <span class="capitalize">{{ formattedExpDate }}</span>
         </template>
       </p>
     </div>
@@ -41,7 +41,10 @@
         v-for="post in posts"
         :key="post._id"
       >
-        <router-link :to="`/posts/${post._id}`" class="block relative padding-bottom-full overflow-hidden">
+        <router-link
+          :to="`/posts/${post._id}`"
+          class="block relative padding-bottom-full overflow-hidden"
+        >
           <img
             class="absolute h-full w-full object-cover object-center"
             v-if="post.file.mimetype.split('/')[0] === 'image'"
@@ -101,13 +104,6 @@ export default {
   mounted() {
     this.setUpStripeElementCard();
   },
-  // beforeRouteUpdate(to, from, next) {
-  //   debugger;
-  //   if (to.path !== from.path) {
-  //     debugger;
-  //     window.location = to.path;
-  //   }
-  // },
   created() {
     // fetch post feed
     this.fetchPost();
@@ -115,9 +111,9 @@ export default {
   computed: {
     ...mapState(["userAuth"]),
     formattedExpDate() {
-      const options = { year: "numeric", month: "long", day: "numeric" }
-      return new Date(this.subscription.expires).toLocaleDateString(undefined, options)
-    },
+      const options = { year: "numeric", month: "long", day: "numeric" };
+      return new Date(this.subscription.expires).toLocaleDateString(undefined, options);
+    }
   },
   methods: {
     ...mapActions(["logout"]),
@@ -125,30 +121,31 @@ export default {
       // fetch post feed
       this.$http
         ._get(`/users/${this.$route.params.id}/posts`)
-        .then(function(res) {
-          if (res.success) {
-            this.following = true;
-            this.creator = res.creator;
-            this.subscription = res.subscription;
-            this.posts = res.posts.filter(p => !p.deleted);
-            // TODO: store this date globally, so that we can reuse the other computed data dervived
-            // from this for other views, instead of making the same request against
-            // check if logged-in user's creator-profile, if so, fetch follower, following count
-            if (this.userAuth.user.id === res.creator.id) {
-              // fetch follower count;
-              return this.$http._get('/users/followers-following')
-                .then((res) => {
+        .then(
+          function(res) {
+            if (res.success) {
+              this.following = true;
+              this.creator = res.creator;
+              this.subscription = res.subscription;
+              this.posts = res.posts.filter(p => !p.deleted);
+              // TODO: store this date globally, so that we can reuse the other computed data dervived
+              // from this for other views, instead of making the same request against
+              // check if logged-in user's creator-profile, if so, fetch follower, following count
+              if (this.userAuth.user.id === res.creator.id) {
+                // fetch follower count;
+                return this.$http._get("/users/followers-following").then(res => {
                   this.stats = {
                     following: res.following,
-                    followers: res.followers,
+                    followers: res.followers
                   };
-                })
+                });
+              }
             }
-          }
-          if (res.creator) {
-            this.creator = res.creator;
-          }
-        }.bind(this))
+            if (res.creator) {
+              this.creator = res.creator;
+            }
+          }.bind(this)
+        )
         .catch(error => {
           if (error && error.response && error.response.status === 401) {
             this.logout();

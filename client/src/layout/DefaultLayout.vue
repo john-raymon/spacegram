@@ -15,6 +15,13 @@
               </router-link>
             </li>
             <li>
+              <router-link
+                to="/settings"
+              >
+                Settings
+              </router-link>
+            </li>
+            <li>
               <button @click="$emit('log-out')">
                 Sign out
               </button>

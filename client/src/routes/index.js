@@ -7,6 +7,7 @@ import PostDetailPage from "@/pages/PostDetailPage";
 import SubscribersPage from "@/pages/SubscribersPage";
 import FollowingPage from "@/pages/FollowingPage";
 import CreatePostPage from "@/pages/CreatePostPage";
+import SettingsPage from '@/pages/SettingsPage';
 import store from "@/vuex";
 
 const routes = [
@@ -22,6 +23,14 @@ const routes = [
     meta: {
       requireUserAuth: true
     }
+  },
+  {
+    name: "settings-page",
+    path: "/settings",
+    component: SettingsPage,
+    meta: {
+      requireUserAuth: true,
+    },
   },
   {
     name: "create-post",

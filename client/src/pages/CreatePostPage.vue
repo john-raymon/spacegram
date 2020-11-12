@@ -20,7 +20,8 @@
       accepted-file-types="image/*, video/*"
     />
     <button
-      class="text-red-800 w-full font-medium text-md bg-white py-3 px-6 outline-none focus:outline-none focus:bg-red-100 hover:bg-red-100 mx-auto rounded-full"
+      :disabled="loading"
+      class="base-button"
     >
       Post
     </button>
@@ -48,11 +49,13 @@ export default {
   data() {
     return {
       postDescription: "",
-      files: []
+      files: [],
+      loading: false,
     };
   },
   methods: {
     handleFormSubmit() {
+      this.loading = true;
       const { file = undefined } = this.$refs.filePond.getFile();
       if (!file) {
         return alert("Please add media to your post.");
@@ -82,7 +85,10 @@ export default {
         .catch((err) => {
           alert("We're sorry, we were not able to create your post right now.");
           console.log('Error, while trying to create post', err)
-        });
+        })
+        .finally(() => {
+          this.loading = false;
+        })
     }
   }
 };

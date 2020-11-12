@@ -5,7 +5,7 @@
         <router-link to="/" class="w-48 text-white fill-current">
           <OnlyInstaLogo />
         </router-link>
-        <ul class="flex justify-end w-full space-x-4">
+        <ul class="flex justify-end text-xs md:text-sm w-full space-x-4">
           <template v-if="userAuth.isAuth">
             <li>
               <router-link

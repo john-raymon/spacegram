@@ -32,7 +32,7 @@ module.exports = {
     (req, res, next) => {
       // authorize only the creator or a subscriber
       const getAllCreatorPost = () => Post.find({
-        user: req.creatorUser.id,
+      user: req.creatorUser.id,
       }).exec().then((posts) => ({ monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, success: true, posts, creator: { firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || '', id: req.creatorUser.id }}));
       if (req.creatorUser.id === req.user.id) {
         // return creator posts to creator
@@ -377,20 +377,34 @@ module.exports = {
    */
   update: [
     (req, res, next) => {
-      const whitelistedKeys = ["email", "username", "password", "firstName", "lastName"];
-
+      const whitelistedKeys = ["email", "username", "firstName", "lastName"];
+      // allow only white-listed keys to be assigned to the req.user document model
       for (const prop in req.body) {
-        if (whitelistedKeys.includes(prop) && prop !== "password") {
+        if (whitelistedKeys.includes(prop)) {
           req.user[prop] = req.body[prop];
         }
-      }
-      if (req.body.password) {
-        // TODO: send security email to user
-        req.user.setPassword(req.body.password);
       }
       return req.user
       .save()
       .then(function(user) {
+        if (req.body.password) {
+          // authenticate current user's password
+          if (!req.body.currentPassword || !req.user.validPassword(req.body.currentPassword)) {
+            return next({
+              name: 'BadRequest',
+              message: 'Your password is incorrect.'
+            });
+          }
+          // TODO: send security email to user
+          req.user.setPassword(req.body.password);
+          req.user.save().then((user) => {
+            req.logout();
+            return res.json({
+              success: true,
+              user: user.authSerialize()
+            });
+          })
+        }
         return res.json({
           success: true,
           user: user.authSerialize()

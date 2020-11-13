@@ -1,10 +1,11 @@
 module.exports = {
   theme: {
     fontFamily: {
-      mich: ["Michroma"]
+      elMessiri: ["El Messiri", "sans-serif"]
     }
   },
   variants: {
-    transitionProperty: ["responsive", "hover", "focus"]
+    transitionProperty: ["responsive", "hover", "focus"],
+    borderWidth: ["responsive", "hover", "focus"]
   }
 };

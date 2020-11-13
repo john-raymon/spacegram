@@ -3,6 +3,16 @@
     <div class="container max-w-md mx-auto flex-1 flex flex-col items-center justify-center px-2">
       <div class="bg-white px-6 py-8 rounded shadow-md text-black w-full">
         <h1 class="tracking-wide pb-8 text-center text-gray-800">Sign up as user</h1>
+
+        <input
+          type="text"
+          class="text-field"
+          name="username"
+          required="true"
+          placeholder="Create a unique username"
+          v-model="username"
+        />
+
         <input
           type="text"
           class="text-field"
@@ -19,13 +29,7 @@
           v-model="lastName"
         />
 
-        <input
-          type="text"
-          class="text-field"
-          name="email"
-          placeholder="Email"
-          v-model="email"
-        />
+        <input type="text" class="text-field" name="email" placeholder="Email" v-model="email" />
 
         <input
           type="password"
@@ -35,11 +39,7 @@
           v-model="password"
         />
 
-        <button
-          type="submit"
-          class="button w-full"
-          @click="onSubmit"
-        >
+        <button type="submit" class="button w-full" @click="onSubmit">
           Create Account
         </button>
 
@@ -57,8 +57,8 @@
 
       <div class="text-gray-dark mt-6">
         Already have an account?
-        <router-link class="no-underline border-b border-blue-500 text-blue-500" to="/login">
-          Log in
+        <router-link class="no-underline border-b border-blue-500 text-blue-500" to="/sign-in">
+          Sign in here
         </router-link>
       </div>
     </div>
@@ -69,19 +69,15 @@ import { mapActions } from "vuex";
 
 export default {
   name: "AuthPage",
-  props: ['userAuth'],
+  props: ["userAuth"],
   data() {
     return {
       email: "",
       firstName: "",
       lastName: "",
       password: "",
-      billingAddressLine: "",
-      billingCity: "",
-      billingState: "",
-      billingPostalCode: "",
-      billingCountry: "",
-      phoneNumber: ""
+      phoneNumber: "",
+      username: ""
     };
   },
   watch: {
@@ -109,7 +105,7 @@ export default {
         .catch(err => {
           if (err.response) {
             console.log("Error when attempting to create new user", err, err.response);
-            return alert(JSON.stringify(err.response.data));
+            return alert(err.response.data && (err.response.data.message || JSON.stringify(err.response.data)));
           }
         });
     }

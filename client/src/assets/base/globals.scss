@@ -1,3 +1,23 @@
+.filepond--root {
+  font-family: "El Messiri";
+  label {
+    @apply cursor-pointer;
+  }
+}
+
+.base-button {
+  @apply text-red-800 w-full font-medium text-base bg-white py-3 px-6 outline-none mx-auto rounded-full;
+  &:hover {
+    @apply bg-red-100;
+  }
+  &:focus {
+    @apply outline-none bg-red-100;
+  }
+  &:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+}
+
 .button {
   @apply
     bg-green-600
@@ -17,4 +37,31 @@
 
 .text-field {
   @apply block border border-gray-300 w-full p-3 rounded mb-4;
+}
+
+.bg-pink-light {
+  background-color: #FDE8E8;
+}
+
+.bg-gray-oi {
+  background-color: #040505;
+}
+
+.onlyinsta-background-gradient {
+  background: linear-gradient(180deg, #FDE8E8 61.17%, #FFFFFF 86.3%);
+}
+
+.padding-bottom-full {
+  padding-bottom: 100%;
+}
+
+.transparent-background-shadow {
+  &::before {
+    @apply absolute top-0 left-0;
+    z-index: -1;
+    content: '';
+    width: 100%;
+    height: 120%;
+    background: linear-gradient(to bottom, #000000d9, rgba(0, 0, 0, 0));
+  }
 }

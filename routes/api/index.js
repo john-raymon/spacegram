@@ -7,6 +7,7 @@ const router = express.Router();
  * exported from this module
  */
 router.use('/users', require('./users'));
+router.use('/posts', require('./posts'));
 
 /**
  * error-handler (hence the 4 argument signature)
@@ -21,6 +22,14 @@ router.use(function(err, req, res, next) {
    * to the root app.js error-handler
    * app-level middleware
    */
+
+  if (err.name === "ForbiddenError") {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied.",
+      ...err,
+    });
+  }
 
   if (err.name === "UnauthorizedError") {
     return res.status(401).json({

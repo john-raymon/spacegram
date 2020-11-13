@@ -1,9 +1,21 @@
-const Passport = require("passport").Passport;
+const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const mongoose = require("mongoose");
 const User = require("@/models/User");
 
-const userPassport = new Passport();
+const userPassport = new passport.Passport();
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function (err, user) {
+      if (err) { return done(err); }
+      done(null, user);
+  });
+});
+
 userPassport.use(
   new LocalStrategy(
     {

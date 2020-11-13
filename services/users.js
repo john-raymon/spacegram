@@ -397,7 +397,7 @@ module.exports = {
           }
           // TODO: send security email to user
           req.user.setPassword(req.body.password);
-          req.user.save().then((user) => {
+          return req.user.save().then((user) => {
             req.logout();
             return res.json({
               success: true,

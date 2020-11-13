@@ -63,8 +63,8 @@ class Agent {
       .then(this._responseBody);
   }
 
-  _patch(url, body) {
-    return this.superagent.patch(`${this.API_ROOT}${url}`, body).then(this._responseBody);
+  _patch(url, body, fullPath = false) {
+    return axios.patch(fullPath ? url : `${this.API_ROOT}${url}`, body).then(this._responseBody);
   }
 
   _post(url, body, fullPath = false, config) {

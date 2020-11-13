@@ -7,6 +7,8 @@ import PostDetailPage from "@/pages/PostDetailPage";
 import SubscribersPage from "@/pages/SubscribersPage";
 import FollowingPage from "@/pages/FollowingPage";
 import CreatePostPage from "@/pages/CreatePostPage";
+import SettingsPage from '@/pages/SettingsPage';
+import ChangePasswordPage from '@/pages/Settings/ChangePasswordPage';
 import store from "@/vuex";
 
 const routes = [
@@ -22,6 +24,22 @@ const routes = [
     meta: {
       requireUserAuth: true
     }
+  },
+  {
+    name: "settings-page",
+    path: "/settings",
+    component: SettingsPage,
+    meta: {
+      requireUserAuth: true,
+    },
+  },
+  {
+    name: "change-password-page",
+    path: "/settings/password",
+    component: ChangePasswordPage,
+    meta: {
+      requireUserAuth: true,
+    },
   },
   {
     name: "create-post",

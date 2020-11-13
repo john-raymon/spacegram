@@ -37,31 +37,27 @@
     </div>
     <ul v-if="following" class="flex flex-wrap w-full">
       <li
-        class="w-1/2 md:w-1/3 cursor-pointer hover:opacity-75"
-        v-for="post in posts"
+        class="w-1/3 cursor-pointer hover:opacity-75"
+        v-for="post in computedPosts"
         :key="post._id"
       >
-        <router-link
-          :to="`/posts/${post._id}`"
-          class="block relative padding-bottom-full overflow-hidden"
-        >
-          <img
-            class="absolute h-full w-full object-cover object-center"
-            v-if="post.file.mimetype.split('/')[0] === 'image'"
-            :src="post.file.url"
-          />
-          <img
-            v-else
-            :src="`${post.file.url.split(/\.(?=[^\.]+$)/)[0]}.jpg`"
-            class="absolute h-full w-full object-cover object-center"
-          />
-          <!-- <video
-            v-else
-            class="absolute h-full w-full object-cover object-center"
-            :src="post.file.url"
-            controls
-          ></video> -->
-        </router-link>
+        <div class="p-1 md:p-4">
+          <router-link
+            :to="`/posts/${post._id}`"
+            class="block relative padding-bottom-full overflow-hidden"
+          >
+            <img
+              class="absolute h-full w-full object-cover object-center"
+              v-if="post.file.mimetype.split('/')[0] === 'image'"
+              :src="post.file.url"
+            />
+            <img
+              v-else
+              :src="`${post.file.url.split(/\.(?=[^\.]+$)/)[0]}.jpg`"
+              class="absolute h-full w-full object-cover object-center"
+            />
+          </router-link>
+        </div>
       </li>
     </ul>
     <div v-else class="flex flex-col max-w-screen-md mx-auto">
@@ -113,6 +109,10 @@ export default {
     formattedExpDate() {
       const options = { year: "numeric", month: "long", day: "numeric" };
       return new Date(this.subscription.expires).toLocaleDateString(undefined, options);
+    },
+    computedPosts() {
+      const posts = [...this.posts]
+      return posts.reverse();
     }
   },
   methods: {

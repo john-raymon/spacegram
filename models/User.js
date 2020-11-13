@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema(
     username: {
       type: String,
       lowercase: true,
-      unique: true,
+      unique: [true, 'This username is already taken.'],
       index: true,
       required: [true, "is required"],
       default: () => (`user${crypto.randomBytes(4).toString("hex")}`),
@@ -60,7 +60,7 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-UserSchema.plugin(uniqueValidator, { type: "mongoose-unique-validator" });
+UserSchema.plugin(uniqueValidator, { type: "mongoose-unique-validator", message: 'The {PATH} belongs to an existing account.' });
 
 UserSchema.methods.setPassword = function(password) {
   // create a salt for the user

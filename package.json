@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
+    "heroku-postbuild": "yarn client:build",
     "client:build": "cd client && yarn install && yarn build",
     "dev-server": "NODE_ENV=development nodemon --inspect ./bin/www",
     "client": "concurrently --kill-others-on-fail 'cd client && yarn serve'",

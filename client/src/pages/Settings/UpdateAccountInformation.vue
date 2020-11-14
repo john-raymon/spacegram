@@ -7,15 +7,15 @@
       <div class="flex items-center flex-row flex-wrap justify-start">
         <div class="relative w-32 h-auto rounded-full mb-2 mr-4">
           <div class="relative w-full padding-bottom-full rounded-full overflow-hidden">
-            <img v-if="userAuth.user.imageFile" class="absolute w-full h-full object-cover" :src="userAuth.user.imageFile.url" />
+            <img v-if="profileImage" class="absolute w-full h-full object-cover" :src="profileImage" />
             <span v-else class="absolute uppercase flex items-center justify-center w-full h-full text-black bg-red-100">
               {{ userAuth.user.username[0] }}
               {{ userAuth.user.username[1] }}
             </span>
           </div>
         </div>
-        <button class="relative base-button w-auto text-sm border text-white hover:text-black bg-transparent">
-          <input class="opacity-0 absolute top-0 left-0 w-full h-full cursor-pointer" type="file" name="avatar" accept="image/*, video/*" />
+        <button class="relative base-button w-auto text-sm border text-white focus:text-black hover:text-black bg-transparent">
+          <input @change="handleFileChange" class="opacity-0 absolute top-0 left-0 w-full h-full cursor-pointer" type="file" name="avatar" accept="image/*, video/*" />
           Change profile picture
         </button>
       </div>
@@ -60,6 +60,8 @@ export default {
     return {
       email: '',
       username: '',
+      profileImage: '',
+      file: null,
       loading: false,
     };
   },
@@ -71,18 +73,44 @@ export default {
       handler() {
         this.email = this.userAuth.user.email;
         this.username = this.userAuth.user.username;
+        this.profileImage = this.userAuth.user.imageFile && this.userAuth.user.imageFile.url;
       },
       immediate: true,
     }
   },
   methods: {
     ...mapActions(["updateUserAuth"]),
+    handleFileChange(e) {
+      if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        this.file = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.profileImage = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    },
     handleSubmit() {
       this.loading = true;
-      this.$http._patch('/users', {
-        email: (this.email || undefined),
-        username: (this.username || undefined),
-      })
+      let axiosPatch = undefined;
+      if (this.file) {
+        const formData = new FormData();
+        formData.append('user-image', this.file);
+        formData.append('username', this.username || undefined);
+        formData.append('email', this.email || undefined)
+        axiosPatch = () => this.$http._patch('/users', formData, null, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      } else {
+        axiosPatch = () => this.$http._patch('/users', {
+          email: (this.email || undefined),
+          username: (this.username || undefined),
+        });
+      }
+      axiosPatch()
         .then((res) => {
           if (!res.success) {
             return alert(res.message || 'Sorry, we weren\'t able to save your changes at this time.');

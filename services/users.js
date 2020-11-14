@@ -378,6 +378,9 @@ module.exports = {
    */
   update: [
     (req, res, next) => {
+      /**
+       * TODO: we need to remove any previously uploaded user-image, and also compress this image
+       */
       multerCloudinaryMiddleware.single('user-image')(req, res, (err) => {
         if (err) {
           return next(err);

@@ -2,9 +2,15 @@
   <div class="pb-6 mx-auto text-white w-full px-4">
     <div v-if="creator" class="flex  justify-between items-center py-2 pb-4 mb-4 mx-auto space-x-4">
       <div class="flex items-center flex-wrap md:space-x-4">
-        <div class="w-32 h-auto bg-red-200 rounded-full mb-2 mr-2">
-          <div class="w-full padding-bottom-full rounded-full bg-red-200"></div>
-        </div>
+        <router-link :to="`/creator/${creator.id}`" class="relative w-32 h-auto rounded-full mb-2 mr-2">
+          <div class="relative w-full padding-bottom-full rounded-full overflow-hidden">
+            <img v-if="creator.imageFile" class="absolute w-full h-full object-cover" :src="creator.imageFile.url" />
+            <span v-else class="absolute uppercase flex items-center justify-center w-full h-full text-black bg-red-200">
+              {{ creator.username[0] }}
+              {{ creator.username[1] }}
+            </span>
+          </div>
+        </router-link>
         <p class="text-red-200 text-sm md:text-lg">
           @<span class="capitalize">{{ creator.username }}</span>
         </p>
@@ -75,8 +81,7 @@
         Subscribe now for $10/month
       </button>
       <span class="text-xs text-white text-center block my-4 leading-none"
-        >(no automatic renewals)</span
-      >
+        >(no automatic renewals)</span>
     </div>
   </div>
 </template>
@@ -141,6 +146,8 @@ export default {
                 });
               }
             }
+            // not following, so set creator data, and allow UI to show
+            // subscribe form to follow
             if (res.creator) {
               this.creator = res.creator;
             }

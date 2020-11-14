@@ -7,7 +7,7 @@ const service = require("@/services/posts");
 // callback trigger for postId param
 router.param(":postId", function(req, res, next, postId) {
   return Post.findById(postId)
-    .populate('user') // note: the user populated here is the creator in this context
+    .populate('user', ['username', 'id', 'firstName', 'lastName', 'imageFile']) // note: the user populated here is the creator in this context
     .exec()
     .then(function(post) {
       if (!post) {

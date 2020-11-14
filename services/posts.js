@@ -13,7 +13,6 @@ const Subscription = require('@/models/Subscription');
  */
 const isBodyMissingProps = require('@/utils/isBodyMissingProps');
 const { multerMiddleware: multerCloudinaryMiddleware, cloudinary } = require("@/middleware/multerCloudinary");
-const { post } = require('../app');
 
 module.exports = {
   getPostFeed: [
@@ -43,7 +42,7 @@ module.exports = {
             })
           }
           const postFindQuery = following.length > 1 ? ({ $or: following.map(s => ({ user: s.creator })) }) : ({  user: following[0].creator });
-          return Post.find(postFindQuery).sort({ "createdAt": -1 }).populate('user', ['username', 'id', 'firstName', 'lastName'])
+          return Post.find(postFindQuery).sort({ "createdAt": -1 }).populate('user', ['username', 'id', 'firstName', 'lastName', 'imageFile'])
           .exec()
             .then((posts) => {
               return res.json({
@@ -75,11 +74,13 @@ module.exports = {
               name: "ForbiddenError",
             })
           }
-          return res.json({ success: true, post: req.post, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '' } })
+          return res.json({ success: true, post: req.post, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '', imageFile: req.post.user.imageFile } })
         })
         .catch(next)
       }
-      return res.json({ success: true, post: req.post, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '' } })
+      // return here, since the creator is attempting to read their post hence
+      // no need to check for a subscription
+      return res.json({ success: true, post: req.post, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '', imageFile: req.post.user.imageFile } })
     },
   ],
   /**

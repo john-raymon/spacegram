@@ -9,6 +9,7 @@ import FollowingPage from "@/pages/FollowingPage";
 import CreatePostPage from "@/pages/CreatePostPage";
 import SettingsPage from '@/pages/SettingsPage';
 import ChangePasswordPage from '@/pages/Settings/ChangePasswordPage';
+import UpdateAccountInformation from '@/pages/Settings/UpdateAccountInformation';
 import store from "@/vuex";
 
 const routes = [
@@ -29,6 +30,14 @@ const routes = [
     name: "settings-page",
     path: "/settings",
     component: SettingsPage,
+    meta: {
+      requireUserAuth: true,
+    },
+  },
+  {
+    name: "update-your-account-information",
+    path: "/settings/account",
+    component: UpdateAccountInformation,
     meta: {
       requireUserAuth: true,
     },

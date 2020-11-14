@@ -23,6 +23,7 @@ const { userPassport } = require('@/config/passport');
 const querystring = require("querystring");
 const stripe = require("stripe")(config.get('stripe.secretKey'));
 const crypto = require("crypto");
+const { multerMiddleware: multerCloudinaryMiddleware, cloudinary } = require("@/middleware/multerCloudinary");
 
 /**
  * TODO: Require users to connect to express before viewing orders/subscriptions
@@ -33,7 +34,7 @@ module.exports = {
       // authorize only the creator or a subscriber
       const getAllCreatorPost = () => Post.find({
       user: req.creatorUser.id,
-      }).exec().then((posts) => ({ monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, success: true, posts, creator: { firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || '', id: req.creatorUser.id }}));
+      }).exec().then((posts) => ({ monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, success: true, posts, creator: { firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || '', id: req.creatorUser.id, imageFile: req.creatorUser.imageFile }}));
       if (req.creatorUser.id === req.user.id) {
         // return creator posts to creator
         return getAllCreatorPost().then((postRes) => {
@@ -51,7 +52,7 @@ module.exports = {
           })
           .then((subscription) => {
             if (!subscription) {
-              return res.json({ creator: { monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || '', id: req.creatorUser.id, }, name: "ForbiddenError" })
+              return res.json({ creator: { monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || '', id: req.creatorUser.id, imageFile: req.creatorUser.imageFile }, name: "ForbiddenError" })
             }
             return getAllCreatorPost().then((postRes) => {
               return res.json({...postRes, subscription })
@@ -72,13 +73,13 @@ module.exports = {
           expires: {
             $gte: new Date(),
           }
-        }).populate('subscriber', ['username', 'id']).populate('creator', ['username', 'id', 'firstName', 'lastName']).exec(),
+        }).populate('subscriber', ['username', 'id']).populate('creator', ['username', 'id', 'firstName', 'lastName', 'imageFile']).exec(),
         Subscription.find({
           creator: req.user.id,
           expires: {
             $gte: new Date(),
           }
-        }).populate('creator', ['username', 'id']).populate('subscriber', ['username', 'id', 'firstName', 'lastName']).exec(),
+        }).populate('creator', ['username', 'id']).populate('subscriber', ['username', 'id', 'firstName', 'lastName', 'imageFile']).exec(),
       ]).then(([following, followers]) => {
         // TODO: serialize the subscription objects using getSubscriptionObject
         /**
@@ -377,6 +378,17 @@ module.exports = {
    */
   update: [
     (req, res, next) => {
+      /**
+       * TODO: we need to remove any previously uploaded user-image, and also compress this image
+       */
+      multerCloudinaryMiddleware.single('user-image')(req, res, (err) => {
+        if (err) {
+          return next(err);
+        }
+        return next();
+      });
+    },
+    (req, res, next) => {
       const whitelistedKeys = ["email", "username", "firstName", "lastName"];
       // allow only white-listed keys to be assigned to the req.user document model
       for (const prop in req.body) {
@@ -397,8 +409,21 @@ module.exports = {
           }
           // TODO: send security email to user
           req.user.setPassword(req.body.password);
-          req.user.save().then((user) => {
+          return req.user.save().then((user) => {
             req.logout();
+            return res.json({
+              success: true,
+              user: user.authSerialize()
+            });
+          })
+        }
+        if (req.file) {
+          req.user.imageFile = {
+            url: req.file.path,
+            public_id: req.file.filename,
+            ...req.file,
+          }
+          return req.user.save().then((user) => {
             return res.json({
               success: true,
               user: user.authSerialize()

@@ -6,7 +6,7 @@
 }
 
 .base-button {
-  @apply text-red-800 w-full font-medium text-base bg-white py-3 px-6 outline-none mx-auto rounded-full;
+  @apply text-red-800 font-medium text-base bg-white py-3 px-6 outline-none rounded-full;
   &:hover {
     @apply bg-red-100;
   }

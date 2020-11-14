@@ -49,6 +49,10 @@ const UserSchema = new mongoose.Schema(
       type: Map,
       of: String
     },
+    imageFile: {
+      type: Map,
+      of: String,
+    },
     salt: String,
     hash: String,
     suspended: { type: Boolean, default: false },
@@ -96,6 +100,7 @@ UserSchema.methods.authSerialize = function() {
     isEmailConfirmed: this.isEmailConfirmed,
     lastLoginAt: new Date(this.lastLoginAt).toUTCString(),
     username: this.username,
+    imageFile: this.imageFile,
   };
 };
 

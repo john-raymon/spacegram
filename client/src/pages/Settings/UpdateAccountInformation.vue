@@ -103,7 +103,6 @@ export default {
             maxWidthOrHeight: 1920,
           }
           return imageCompression(this.file, options).then((file) => {
-            debugger;
             const formData = new FormData();
             formData.append('user-image', file);
             formData.append('username', this.username || undefined);

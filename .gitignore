@@ -65,3 +65,5 @@ typings/
 *.scss.map
 !tailwindcss.css
 !tachyons.css
+
+*.pem

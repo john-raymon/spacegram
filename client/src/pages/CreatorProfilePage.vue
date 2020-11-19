@@ -55,11 +55,11 @@
             <img
               class="absolute h-full w-full object-cover object-center"
               v-if="post.file.mimetype.split('/')[0] === 'image'"
-              :src="post.file.url"
+              :src="post.url"
             />
             <img
               v-else
-              :src="`${post.file.url.split(/\.(?=[^\.]+$)/)[0]}.jpg`"
+              :src="`${post.url}.jpg`"
               class="absolute h-full w-full object-cover object-center"
             />
           </router-link>

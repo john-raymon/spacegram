@@ -10,7 +10,7 @@ router.param(":postId", function(req, res, next, postId) {
     .populate('user', ['username', 'id', 'firstName', 'lastName', 'imageFile']) // note: the user populated here is the creator in this context
     .exec()
     .then(function(post) {
-      if (!post) {
+      if (!post || post.deleted) {
         return res.sendStatus(404);
       }
       req.post = post;

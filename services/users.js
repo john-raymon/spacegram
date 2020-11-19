@@ -32,8 +32,11 @@ module.exports = {
   getAllPostsForACreator: [
     (req, res, next) => {
       // authorize only the creator or a subscriber
+      // TODO: since iterating through each post to generate a signed url
+      // is expensive, we need use the cloudfront cookie protected urls
+      // instead of signed protected urls
       const getAllCreatorPost = () => Post.find({
-      user: req.creatorUser.id,
+        user: req.creatorUser.id,
       }).exec().then((posts) => ({ monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, success: true, posts, creator: { firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || '', id: req.creatorUser.id, imageFile: req.creatorUser.imageFile }}));
       if (req.creatorUser.id === req.user.id) {
         // return creator posts to creator

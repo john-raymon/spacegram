@@ -6,10 +6,10 @@
           <div class="w-full overflow-hidden rounded-lg bg-black shadow-lg">
             <img
               v-if="post.file.mimetype.split('/')[0] === 'image'"
-              :src="post.file.url"
+              :src="post.url"
               width="100%"
             />
-            <video v-else class="w-full" :src="post.file.url" controls></video>
+            <video v-else class="w-full" :src="post.url" controls></video>
           </div>
           <!-- <div class="flex items-center px-8">
             <p class="mr-2 font-light text-xs">
@@ -35,7 +35,7 @@
               </p>
               <router-link :to="`/creator/${post.user._id}`" class="relative w-12 h-auto bg-red-200 rounded-full mr-2">
                 <div class="relative w-full padding-bottom-full rounded-full bg-red-200 overflow-hidden">
-                  <img v-if="post.user.imageFile" class="absolute w-full h-full object-cover" :src="creator.imageFile.url" />
+                  <img v-if="post.user.imageFile" class="absolute w-full h-full object-cover" :src="post.user.imageFile.url" />
                   <span v-else class="absolute uppercase flex items-center justify-center w-full h-full text-black">
                     {{ post.user.username[0] }}
                     {{ post.user.username[1] }}

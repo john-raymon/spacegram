@@ -26,8 +26,13 @@ const postGetSignedUrl = (fileKey, millisecondsExpiration = 60000) => {
   return cloudFrontSignedUrl;
 };
 
+const mapSignedUrlsToPost = (posts) => posts.map((post) => {
+  return { ...post.toJSON(), url: postGetSignedUrl(post.file.get('key')) };
+});
+
 module.exports = {
   postGetSignedUrl,
+  mapSignedUrlsToPost,
   getPostFeed: [
     (req, res, next) => {
       /**
@@ -60,7 +65,7 @@ module.exports = {
             .then((posts) => {
               return res.json({
                 success: true,
-                postFeed: posts,
+                postFeed: mapSignedUrlsToPost(posts),
               })
             });
         }).catch(next);

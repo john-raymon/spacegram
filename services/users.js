@@ -4,6 +4,11 @@
 const config = require('config');
 
 /**
+ * services
+ */
+const postService = require('@/services/posts');
+
+/**
  * models
  */
 const User = require('@/models/User');
@@ -37,7 +42,21 @@ module.exports = {
       // instead of signed protected urls
       const getAllCreatorPost = () => Post.find({
         user: req.creatorUser.id,
-      }).exec().then((posts) => ({ monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, success: true, posts, creator: { firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || '', id: req.creatorUser.id, imageFile: req.creatorUser.imageFile }}));
+      }).exec().then((posts) => {
+        const postWithSignedUrls = postService.mapSignedUrlsToPost(posts);
+        return {
+          monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
+          success: true,
+          posts: postWithSignedUrls,
+          creator: {
+            firstName: req.creatorUser.firstName || '',
+            lastName: req.creatorUser.lastName || '',
+            username: req.creatorUser.username || '',
+            id: req.creatorUser.id,
+            imageFile: req.creatorUser.imageFile
+          }
+        };
+      });
       if (req.creatorUser.id === req.user.id) {
         // return creator posts to creator
         return getAllCreatorPost().then((postRes) => {

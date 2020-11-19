@@ -1341,13 +1341,6 @@ autoprefixer@^9.8.5:
     postcss "^7.0.32"
     postcss-value-parser "^4.1.0"
 
-aws-cloudfront-sign@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/aws-cloudfront-sign/-/aws-cloudfront-sign-2.2.0.tgz#3910f5a6d0d90fec07f2b4ef8ab07f3eefb5625d"
-  integrity sha1-ORD1ptDZD+wH8rTvirB/Pu+1Yl0=
-  dependencies:
-    lodash "^3.6.0"
-
 aws-sdk@^2.794.0:
   version "2.794.0"
   resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.794.0.tgz#7eb1f2fa277a91731253c2e9fee57b6096230d15"
@@ -4820,11 +4813,6 @@ lodash.uniqueid@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/lodash.uniqueid/-/lodash.uniqueid-4.0.1.tgz#3268f26a7c88e4f4b1758d679271814e31fa5b26"
   integrity sha1-MmjyanyI5PSxdY1nknGBTjH6WyY=
-
-lodash@^3.6.0:
-  version "3.10.1"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
-  integrity sha1-W/Rejkm6QYnhfUgnid/RW9FAt7Y=
 
 lodash@^4.0.0, lodash@^4.17.11, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.4, lodash@~4.17.10:
   version "4.17.20"

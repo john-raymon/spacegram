@@ -5,10 +5,10 @@
         <div class="w-full overflow-hidden rounded-lg bg-black shadow-lg">
           <img
             v-if="post.file.mimetype.split('/')[0] === 'image'"
-            :src="post.file.url"
+            :src="post.url"
             width="100%"
           />
-          <video v-else class="w-full" :src="post.file.url" controls></video>
+          <video v-else class="w-full" :src="post.url" controls></video>
         </div>
         <div class="flex items-center justify-between px-8">
           <p v-if="post.description" class="text-black text-sm pr-4">

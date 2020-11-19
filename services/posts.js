@@ -12,9 +12,22 @@ const Subscription = require('@/models/Subscription');
  * utils
  */
 const isBodyMissingProps = require('@/utils/isBodyMissingProps');
-const { multerMiddleware: multerCloudinaryMiddleware, cloudinary } = require("@/middleware/multerCloudinary");
+// const { multerMiddleware: multerCloudinaryMiddleware, cloudinary } = require("@/middleware/multerCloudinary");
+const { multerS3Middleware } = require("@/middleware/multerS3");
+const CloudFrontSigner = require('aws-sdk').CloudFront.Signer;
+
+const postGetSignedUrl = (fileKey, millisecondsExpiration = 60000) => {
+  const privateKeyString = process.env.CLOUDFRONT_PRIVATE_KEY_STRING ? JSON.parse(process.env.CLOUDFRONT_PRIVATE_KEY_STRING) : '';
+  const cloudFrontSigner = new CloudFrontSigner(process.env.CLOUDFRONT_KEY_PAIR_ID, privateKeyString)
+  const cloudFrontSignedUrl = cloudFrontSigner.getSignedUrl({
+    url: `${process.env.CLOUDFRONT_DOMAIN_NAME}/${fileKey}`,
+    expires: Math.floor((Date.now() + millisecondsExpiration)/1000),
+  });
+  return cloudFrontSignedUrl;
+};
 
 module.exports = {
+  postGetSignedUrl,
   getPostFeed: [
     (req, res, next) => {
       /**
@@ -74,13 +87,15 @@ module.exports = {
               name: "ForbiddenError",
             })
           }
-          return res.json({ success: true, post: req.post, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '', imageFile: req.post.user.imageFile } })
+          debugger;
+          return res.json({ success: true, post: { ...req.post.toJSON(), url: postGetSignedUrl(req.post.file.get('key')) }, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '', imageFile: req.post.user.imageFile } })
         })
         .catch(next)
       }
+      debugger;
       // return here, since the creator is attempting to read their post hence
       // no need to check for a subscription
-      return res.json({ success: true, post: req.post, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '', imageFile: req.post.user.imageFile } })
+      return res.json({ success: true, post: { ...req.post.toJSON(), url: postGetSignedUrl(req.post.file.get('key')) }, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '', imageFile: req.post.user.imageFile } })
     },
   ],
   /**
@@ -88,27 +103,26 @@ module.exports = {
    */
   create: [
     (req, res, next) => {
-      multerCloudinaryMiddleware.single('file')(req, res, (err) => {
+      return multerS3Middleware.single('file')(req, res, (err) => {
+        debugger;
         if (err || !req.file) {
+          debugger;
           return next(err || Error("We weren't able to create your post right now."));
         }
         return next();
       });
     },
     function(req, res, next) {
+      debugger;
       const post = new Post({
         user: req.user.id,
         title: req.body.title,
         description: req.body.description,
-        file: {
-            url: req.file.path,
-            public_id: req.file.filename,
-            ...req.file,
-        }
+        file: req.file,
       });
 
       return post.save().then(post => {
-        res.json({ success: true, post: post.jsonSerialize(), })
+        return res.json({ success: true, post: { ...post.jsonSerialize(), url: postGetSignedUrl(req.file.key, 60000)}});
       })
       .catch(next)
     },

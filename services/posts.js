@@ -13,7 +13,7 @@ const Subscription = require('@/models/Subscription');
  */
 const isBodyMissingProps = require('@/utils/isBodyMissingProps');
 // const { multerMiddleware: multerCloudinaryMiddleware, cloudinary } = require("@/middleware/multerCloudinary");
-const { multerS3Middleware } = require("@/middleware/multerS3");
+const { multerS3Middleware, s3 } = require("@/middleware/multerS3");
 const CloudFrontSigner = require('aws-sdk').CloudFront.Signer;
 
 const postGetSignedUrl = (fileKey, millisecondsExpiration = 60000) => {
@@ -87,12 +87,10 @@ module.exports = {
               name: "ForbiddenError",
             })
           }
-          debugger;
           return res.json({ success: true, post: { ...req.post.toJSON(), url: postGetSignedUrl(req.post.file.get('key')) }, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '', imageFile: req.post.user.imageFile } })
         })
         .catch(next)
       }
-      debugger;
       // return here, since the creator is attempting to read their post hence
       // no need to check for a subscription
       return res.json({ success: true, post: { ...req.post.toJSON(), url: postGetSignedUrl(req.post.file.get('key')) }, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '', imageFile: req.post.user.imageFile } })
@@ -104,16 +102,13 @@ module.exports = {
   create: [
     (req, res, next) => {
       return multerS3Middleware.single('file')(req, res, (err) => {
-        debugger;
         if (err || !req.file) {
-          debugger;
           return next(err || Error("We weren't able to create your post right now."));
         }
         return next();
       });
     },
     function(req, res, next) {
-      debugger;
       const post = new Post({
         user: req.user.id,
         title: req.body.title,
@@ -136,26 +131,21 @@ module.exports = {
         })
       }
       req.post.deleted = true;
-      const public_id = req.post.file.get('filename');
-      return cloudinary.uploader.destroy(public_id, { type: 'upload', resource_type: req.post.file.get("mimetype").split('/')[0] }, (error, _res) => {
-        if (error || _res.result !== 'ok') {
-          return next(error || Error("We weren't able to delete this post right now."));
+      const fileKey = req.post.file.get('key');
+      const s3Params = {
+        Bucket: "onlyinsta-secure-assets",
+        Key: fileKey,
+      };
+      return s3.deleteObject(s3Params, function(err, data) {
+        if (err) {
+          return next(err || Error("We weren't able to delete this post right now."));
         }
-        req.post.file = {
-          "public_id": null,
-          "url": null,
-          "originalname": null,
-          "fieldname": null,
-          "encoding": null,
-          "mimetype": null,
-          "size": null,
-          "filename": null,
-          "path": null,
-        }
+        req.post.file = new Map();
+        req.post.deleted = true;
         return req.post.save().then((post) => {
           return res.json({ success: true, post: post.jsonSerialize() });
-        })
-      })
+        });
+      });
       // multerCloudinaryMiddleware.
     }
   ]

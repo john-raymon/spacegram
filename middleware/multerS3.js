@@ -15,4 +15,4 @@ const multerS3Middleware = multer({
   }),
 });
 
-module.exports = { multerS3Middleware };
+module.exports = { multerS3Middleware, s3 };

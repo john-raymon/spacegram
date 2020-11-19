@@ -15,7 +15,7 @@
           </div>
         </div>
         <button class="relative base-button w-auto text-sm border text-white focus:text-black hover:text-black bg-transparent">
-          <input @change="handleFileChange" class="opacity-0 absolute top-0 left-0 w-full h-full cursor-pointer" type="file" name="avatar" accept="image/*, video/*" />
+          <input @change="handleFileChange" class="opacity-0 absolute top-0 left-0 w-full h-full cursor-pointer" type="file" name="avatar" accept="image/*" />
           Change profile picture
         </button>
       </div>
@@ -53,6 +53,7 @@
 </template>
 <script>
 import { mapState, mapActions } from 'vuex';
+import imageCompression from 'browser-image-compression';
 
 export default {
   name: 'UpdateAccountInformation',
@@ -95,15 +96,25 @@ export default {
       this.loading = true;
       let axiosPatch = undefined;
       if (this.file) {
-        const formData = new FormData();
-        formData.append('user-image', this.file);
-        formData.append('username', this.username || undefined);
-        formData.append('email', this.email || undefined)
-        axiosPatch = () => this.$http._patch('/users', formData, null, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        axiosPatch = () => {
+          // compress file
+          const options = {
+            maxSizeMB: 10,
+            maxWidthOrHeight: 1920,
+          }
+          return imageCompression(this.file, options).then((file) => {
+            debugger;
+            const formData = new FormData();
+            formData.append('user-image', file);
+            formData.append('username', this.username || undefined);
+            formData.append('email', this.email || undefined);
+            return this.$http._patch('/users', formData, null, {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            });
+          })
+        }
       } else {
         axiosPatch = () => this.$http._patch('/users', {
           email: (this.email || undefined),

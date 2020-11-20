@@ -8,16 +8,12 @@
         <ul class="flex justify-end text-xs md:text-sm w-full space-x-4">
           <template v-if="userAuth.isAuth">
             <li>
-              <router-link
-                :to="`/creator/${userAuth.user.id}`"
-              >
+              <router-link :to="`/creator/${userAuth.user.id}`">
                 Profile
               </router-link>
             </li>
             <li>
-              <router-link
-                to="/settings"
-              >
+              <router-link to="/settings">
                 Settings
               </router-link>
             </li>

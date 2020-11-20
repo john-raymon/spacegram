@@ -2,10 +2,20 @@
   <div class="pb-6 mx-auto text-white w-full px-4">
     <div v-if="creator" class="flex  justify-between items-center py-2 pb-4 mb-4 mx-auto space-x-4">
       <div class="flex items-center flex-wrap md:space-x-4">
-        <router-link :to="`/creator/${creator.id}`" class="relative w-32 h-auto rounded-full mb-2 mr-2">
+        <router-link
+          :to="`/creator/${creator.id}`"
+          class="relative w-32 h-auto rounded-full mb-2 mr-2"
+        >
           <div class="relative w-full padding-bottom-full rounded-full overflow-hidden">
-            <img v-if="creator.imageFile" class="absolute w-full h-full object-cover" :src="creator.imageFile.url" />
-            <span v-else class="absolute uppercase flex items-center justify-center w-full h-full text-black bg-red-200">
+            <img
+              v-if="creator.imageFile"
+              class="absolute w-full h-full object-cover"
+              :src="creator.imageFile.url"
+            />
+            <span
+              v-else
+              class="absolute uppercase flex items-center justify-center w-full h-full text-black bg-red-200"
+            >
               {{ creator.username[0] }}
               {{ creator.username[1] }}
             </span>
@@ -52,11 +62,6 @@
             :to="`/posts/${post._id}`"
             class="block relative padding-bottom-full overflow-hidden"
           >
-            <img
-              class="absolute h-full w-full object-cover object-center"
-              v-if="post.file.contentType.split('/')[0] === 'image'"
-              :src="post.url"
-            />
             <div
               v-if="post.file.contentType.split('/')[0] === 'image'"
               class="w-full h-full absolute top-0 left-0 flex items-center justify-center"
@@ -65,21 +70,21 @@
                 class="absolute h-full w-full object-cover object-center opacity-75"
                 :src="post.url"
               />
-              <img
-                class="absolute h-full w-full object-cover object-center opacity-75"
-                src="@/assets/blurred-image.jpg"
-              />
             </div>
-            <div v-else class="w-full h-full absolute top-0 left-0 flex items-center justify-center">
+            <div
+              v-else
+              class="w-full h-full absolute top-0 left-0 flex items-center justify-center"
+            >
               <img
                 class="absolute h-full w-full object-cover object-center opacity-75"
-                src="@/assets/blurred-image.jpg"
+                :src="post.thumbnailUrl"
               />
-              <div class="absolute left-0 top-0 h-full w-full mx-auto flex flex-col items-center justify-center opacity-75">
-                <div class="w-8 h-8">
-                  <EyeIconSvg />
+              <div
+                class="absolute left-0 top-0 h-full w-full mx-auto flex flex-col items-center justify-center opacity-75"
+              >
+                <div class="w-1/4 h-auto fill-current cursor-pointer hover:opacity-50">
+                  <PlayIconSvg />
                 </div>
-                <p class="text-xs tracking-wider px-1 leading-none py-1 text-center">Play hidden video</p>
               </div>
             </div>
           </router-link>
@@ -101,14 +106,15 @@
         Subscribe now for $10/month
       </button>
       <span class="text-xs text-white text-center block my-4 leading-none"
-        >(no automatic renewals)</span>
+        >(no automatic renewals)</span
+      >
     </div>
   </div>
 </template>
 <script>
 import { mapActions, mapState } from "vuex";
 import { loadStripe } from "@stripe/stripe-js";
-import EyeIconSvg from '@/assets/svgs/eye-icon-svg.svg';
+import PlayIconSvg from "@/assets/svgs/play-icon-svg.svg";
 
 export default {
   name: "CreatorProfilePage",
@@ -123,7 +129,7 @@ export default {
     };
   },
   components: {
-    EyeIconSvg,
+    PlayIconSvg,
   },
   // handles setting Stripe.js #card-element when mounted on DOM
   mounted() {
@@ -140,7 +146,7 @@ export default {
       return new Date(this.subscription.expires).toLocaleDateString(undefined, options);
     },
     computedPosts() {
-      const posts = [...this.posts]
+      const posts = [...this.posts];
       return posts.reverse();
     }
   },

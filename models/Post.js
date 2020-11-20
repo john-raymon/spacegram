@@ -11,6 +11,10 @@ const PostSchema = mongoose.Schema(
       type: Map,
       default: new Map()
     },
+    thumbnailFile: {
+      type: Map,
+      default: null,
+    }
   },
   { timestamps: true }
 );

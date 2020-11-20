@@ -12,9 +12,7 @@
         </div>
         <div class="flex items-center justify-between px-8">
           <p v-if="post.description" class="text-black text-sm pr-4">
-            {{
-              post.description
-            }}
+            {{ post.description }}
           </p>
           <div class="flex items-center py-2">
             <p class="mr-2 font-light text-black text-xs">
@@ -27,10 +25,22 @@
               {{ post.user.username[0] }}
               {{ post.user.username[1] }}
             </router-link> -->
-            <router-link :to="`/creator/${creator.id}`" class="relative w-12 h-auto bg-red-200 rounded-full mb-2 mr-2">
-              <div class="relative w-full padding-bottom-full rounded-full bg-red-200 overflow-hidden">
-                <img v-if="creator.imageFile" class="absolute w-full h-full object-cover" :src="creator.imageFile.url" />
-                <span v-else class="absolute uppercase flex items-center justify-center w-full h-full text-black">
+            <router-link
+              :to="`/creator/${creator.id}`"
+              class="relative w-12 h-auto bg-red-200 rounded-full mb-2 mr-2"
+            >
+              <div
+                class="relative w-full padding-bottom-full rounded-full bg-red-200 overflow-hidden"
+              >
+                <img
+                  v-if="creator.imageFile"
+                  class="absolute w-full h-full object-cover"
+                  :src="creator.imageFile.url"
+                />
+                <span
+                  v-else
+                  class="absolute uppercase flex items-center justify-center w-full h-full text-black"
+                >
                   {{ creator.username[0] }}
                   {{ creator.username[1] }}
                 </span>

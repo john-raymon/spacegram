@@ -105,7 +105,9 @@ export default {
         .catch(err => {
           if (err.response) {
             console.log("Error when attempting to create new user", err, err.response);
-            return alert(err.response.data && (err.response.data.message || JSON.stringify(err.response.data)));
+            return alert(
+              err.response.data && (err.response.data.message || JSON.stringify(err.response.data))
+            );
           }
         });
     }

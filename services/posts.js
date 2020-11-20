@@ -27,7 +27,7 @@ const postGetSignedUrl = (fileKey, millisecondsExpiration = 60000) => {
 };
 
 const mapSignedUrlsToPost = (posts) => posts.map((post) => {
-  return { ...post.toJSON(), url: postGetSignedUrl(post.file.get('key')) };
+  return { ...post.toJSON(), url: postGetSignedUrl(post.file.get('key')), thumbnailUrl: (post.thumbnailFile ? postGetSignedUrl((post.thumbnailFile && post.thumbnailFile.get('key'))) : undefined) };
 });
 
 module.exports = {
@@ -106,9 +106,13 @@ module.exports = {
    */
   create: [
     (req, res, next) => {
-      return multerS3Middleware.single('file')(req, res, (err) => {
-        if (err || !req.file) {
+      return multerS3Middleware.fields([{ name: 'file', maxCount: 1 }, { name: 'thumbnailFile', maxCount: 1 }])(req, res, (err) => {
+        if (err || !req.files || !(req.files.file && req.files.file.length)) {
           return next(err || Error("We weren't able to create your post right now."));
+        }
+        req.file = req.files.file[0];
+        if (req.files.thumbnailFile) {
+          req.thumbnailFile = req.files.thumbnailFile[0];
         }
         return next();
       });
@@ -120,7 +124,9 @@ module.exports = {
         description: req.body.description,
         file: req.file,
       });
-
+      if (req.thumbnailFile) {
+        post.thumbnailFile = req.thumbnailFile;
+      };
       return post.save().then(post => {
         return res.json({ success: true, post: { ...post.jsonSerialize(), url: postGetSignedUrl(req.file.key, 60000)}});
       })

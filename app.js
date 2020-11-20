@@ -67,11 +67,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // app.use(cookieParser());
 
-app.use(history());
-app.use(express.static('./client/dist'));
-
 // API endpoints
 app.use('/api', require('./routes/api'));
+
+app.use(history());
+app.use(express.static('./client/dist'));
 
 app.get("/*", function(req, res) {
   return res.sendFile("./client/public/index.html", { root: __dirname });

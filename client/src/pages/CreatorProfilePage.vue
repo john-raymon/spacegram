@@ -57,11 +57,12 @@
               v-if="post.file.mimetype.split('/')[0] === 'image'"
               :src="post.url"
             />
-            <img
+            <video
               v-else
-              :src="`${post.url}.jpg`"
+              :src="post.url"
               class="absolute h-full w-full object-cover object-center"
-            />
+            >
+            </video>
           </router-link>
         </div>
       </li>

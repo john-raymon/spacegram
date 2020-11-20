@@ -40,15 +40,14 @@
   </div>
 </template>
 <script>
-
 export default {
-  name: 'ChangePasswordPage',
+  name: "ChangePasswordPage",
   data() {
     return {
-      currentPassword: '',
-      newPassword: '',
-      confirmNewPassword: '',
-      loading: false,
+      currentPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
+      loading: false
     };
   },
   methods: {
@@ -56,28 +55,36 @@ export default {
       this.loading = true;
       if (this.newPassword !== this.confirmNewPassword) {
         this.loading = false;
-        return alert('Your passwords do not match');
+        return alert("Your passwords do not match");
       }
-      this.$http._patch('/users', {
-        currentPassword: this.currentPassword,
-        password: this.newPassword,
-      })
-        .then((res) => {
-          if (!res.success) {
-            return alert(res.message || 'Sorry, we weren\'t able to save your changes at this time.');
-          }
-          this.currentPassword = '';
-          this.newPassword = '';
-          this.confirmNewPassword = '';
-          return alert('Your changes have been saved!')
+      this.$http
+        ._patch("/users", {
+          currentPassword: this.currentPassword,
+          password: this.newPassword
         })
-        .catch((res) => {
-          return alert(res.response && res.response.data && (res.response.data.message || 'Sorry, we weren\'t able to save your changes at this time.'));
+        .then(res => {
+          if (!res.success) {
+            return alert(
+              res.message || "Sorry, we weren't able to save your changes at this time."
+            );
+          }
+          this.currentPassword = "";
+          this.newPassword = "";
+          this.confirmNewPassword = "";
+          return alert("Your changes have been saved!");
+        })
+        .catch(res => {
+          return alert(
+            res.response &&
+              res.response.data &&
+              (res.response.data.message ||
+                "Sorry, we weren't able to save your changes at this time.")
+          );
         })
         .finally(() => {
           this.loading = false;
-        })
-    },
-  },
-}
+        });
+    }
+  }
+};
 </script>

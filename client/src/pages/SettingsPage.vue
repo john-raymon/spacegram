@@ -53,31 +53,31 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex';
-import KeyIconSvg from '@/assets/svgs/key-icon-svg.svg';
-import RightArrowIcon from '@/assets/svgs/right-arrow-icon-svg.svg';
-import HammerIconSvg from '@/assets/svgs/hammer-icon-svg.svg';
-import SadFaceIconSvg from '@/assets/svgs/sad-face-icon.svg';
+import { mapState } from "vuex";
+import KeyIconSvg from "@/assets/svgs/key-icon-svg.svg";
+import RightArrowIcon from "@/assets/svgs/right-arrow-icon-svg.svg";
+import HammerIconSvg from "@/assets/svgs/hammer-icon-svg.svg";
+import SadFaceIconSvg from "@/assets/svgs/sad-face-icon.svg";
 
 export default {
-  name: 'SettingsPage',
+  name: "SettingsPage",
   components: {
     KeyIconSvg,
     RightArrowIcon,
     HammerIconSvg,
-    SadFaceIconSvg,
+    SadFaceIconSvg
   },
   computed: {
-    ...mapState(["userAuth"]),
-  },
-}
+    ...mapState(["userAuth"])
+  }
+};
 </script>
 <style lang="scss">
-  .settings-page {
-    @apply w-full;
+.settings-page {
+  @apply w-full;
 
-    .settings-item {
-      @apply flex justify-between items-center border-b border-gray-600 w-full py-6 cursor-pointer;
-    }
+  .settings-item {
+    @apply flex justify-between items-center border-b border-gray-600 w-full py-6 cursor-pointer;
   }
+}
 </style>

@@ -12,17 +12,18 @@
               :src="post.url"
               width="100%"
             />
-            <div v-else class="w-full h-32 relative">
+            <div v-else class="w-full h-40 relative">
               <div class="w-full h-full absolute top-0 left-0 flex items-center justify-center">
                 <img
                   class="absolute h-full w-full object-cover object-center opacity-50"
-                  src="@/assets/blurred-image.jpg"
+                  :src="post.thumbnailUrl"
                 />
-                <div class="absolute left-0 top-0 h-full w-full mx-auto flex flex-col items-center text-white justify-center opacity-75">
-                  <div class="w-8 h-8 fill-current">
-                    <EyeIconSvg />
+                <div
+                  class="absolute left-0 top-0 h-full w-full mx-auto flex flex-col items-center text-white justify-center opacity-75"
+                >
+                  <div class="w-1/6 h-auto fill-current cursor-pointer hover:opacity-50">
+                    <PlayIconSvg />
                   </div>
-                  <p class="text-xs tracking-wider px-1 leading-none py-1 text-center">Play hidden video</p>
                 </div>
               </div>
             </div>
@@ -41,18 +42,28 @@
           </div> -->
           <div class="flex items-center justify-between px-6 md:px-8 py-2 w-full">
             <p class="text-black text-sm pr-4">
-              {{
-                post.description
-              }}
+              {{ post.description }}
             </p>
             <div class="flex items-center self-end">
               <p class="mr-2 font-light text-xs">
                 Created by
               </p>
-              <router-link :to="`/creator/${post.user._id}`" class="relative w-12 h-auto bg-red-200 rounded-full">
-                <div class="relative w-full padding-bottom-full rounded-full bg-red-200 overflow-hidden">
-                  <img v-if="post.user.imageFile" class="absolute w-full h-full object-cover" :src="post.user.imageFile.url" />
-                  <span v-else class="absolute uppercase flex items-center justify-center w-full h-full text-black">
+              <router-link
+                :to="`/creator/${post.user._id}`"
+                class="relative w-12 h-auto bg-red-200 rounded-full"
+              >
+                <div
+                  class="relative w-full padding-bottom-full rounded-full bg-red-200 overflow-hidden"
+                >
+                  <img
+                    v-if="post.user.imageFile"
+                    class="absolute w-full h-full object-cover"
+                    :src="post.user.imageFile.url"
+                  />
+                  <span
+                    v-else
+                    class="absolute uppercase flex items-center justify-center w-full h-full text-black"
+                  >
                     {{ post.user.username[0] }}
                     {{ post.user.username[1] }}
                   </span>
@@ -67,7 +78,7 @@
 </template>
 <script>
 import { mapActions } from "vuex";
-import EyeIconSvg from '@/assets/svgs/eye-icon-svg.svg';
+import PlayIconSvg from "@/assets/svgs/play-icon-svg.svg";
 
 export default {
   name: "TimelineHomepage",
@@ -77,7 +88,7 @@ export default {
     };
   },
   components: {
-    EyeIconSvg,
+    PlayIconSvg
   },
   created() {
     // fetch post feed

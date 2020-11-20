@@ -7,9 +7,9 @@ import PostDetailPage from "@/pages/PostDetailPage";
 import SubscribersPage from "@/pages/SubscribersPage";
 import FollowingPage from "@/pages/FollowingPage";
 import CreatePostPage from "@/pages/CreatePostPage";
-import SettingsPage from '@/pages/SettingsPage';
-import ChangePasswordPage from '@/pages/Settings/ChangePasswordPage';
-import UpdateAccountInformation from '@/pages/Settings/UpdateAccountInformation';
+import SettingsPage from "@/pages/SettingsPage";
+import ChangePasswordPage from "@/pages/Settings/ChangePasswordPage";
+import UpdateAccountInformation from "@/pages/Settings/UpdateAccountInformation";
 import store from "@/vuex";
 
 const routes = [
@@ -31,24 +31,24 @@ const routes = [
     path: "/settings",
     component: SettingsPage,
     meta: {
-      requireUserAuth: true,
-    },
+      requireUserAuth: true
+    }
   },
   {
     name: "update-your-account-information",
     path: "/settings/account",
     component: UpdateAccountInformation,
     meta: {
-      requireUserAuth: true,
-    },
+      requireUserAuth: true
+    }
   },
   {
     name: "change-password-page",
     path: "/settings/password",
     component: ChangePasswordPage,
     meta: {
-      requireUserAuth: true,
-    },
+      requireUserAuth: true
+    }
   },
   {
     name: "create-post",

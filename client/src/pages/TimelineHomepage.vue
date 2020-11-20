@@ -1,6 +1,6 @@
 <template>
-  <div class="pb-6 w-full">
-    <ul class="space-y-6 max-w-lg">
+  <div class="pb-6 w-full flex flex-col items-center mt-4">
+    <ul class="space-y-6 max-w-lg w-full">
       <li v-for="post in postFeed" :key="post._id" class="w-full">
         <router-link
           :to="`/posts/${post._id}`"
@@ -12,7 +12,7 @@
               :src="post.url"
               width="100%"
             />
-            <div class="w-full h-32 relative">
+            <div v-else class="w-full h-32 relative">
               <div class="w-full h-full absolute top-0 left-0 flex items-center justify-center">
                 <img
                   class="absolute h-full w-full object-cover object-center opacity-50"

@@ -14,7 +14,7 @@ class Agent {
     //   return config;
     // });
   }
-  static axios (...args) {
+  static axios(...args) {
     return this.axios(...args);
   }
   // static getToken() {
@@ -64,11 +64,15 @@ class Agent {
   }
 
   _patch(url, body, fullPath = false, config) {
-    return axios.patch(fullPath ? url : `${this.API_ROOT}${url}`, body, config).then(this._responseBody);
+    return axios
+      .patch(fullPath ? url : `${this.API_ROOT}${url}`, body, config)
+      .then(this._responseBody);
   }
 
   _post(url, body, fullPath = false, config) {
-    return axios.post(fullPath ? url : `${this.API_ROOT}${url}`, body, config).then(this._responseBody);
+    return axios
+      .post(fullPath ? url : `${this.API_ROOT}${url}`, body, config)
+      .then(this._responseBody);
   }
 }
 

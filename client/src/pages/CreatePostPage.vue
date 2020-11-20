@@ -19,10 +19,7 @@
       label-idle="Click to add a photo or video from your device"
       accepted-file-types="image/*, video/*"
     />
-    <button
-      :disabled="loading"
-      class="base-button"
-    >
+    <button :disabled="loading" class="base-button">
       Post
     </button>
   </form>
@@ -36,6 +33,8 @@ import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
 import "filepond-plugin-media-preview/dist/filepond-plugin-media-preview.min.css";
 import "filepond/dist/filepond.min.css";
+import VideoSnapshot from 'video-snapshot';
+import imageCompression from "browser-image-compression";
 
 export default {
   name: "CreatePostPage",
@@ -50,7 +49,7 @@ export default {
     return {
       postDescription: "",
       files: [],
-      loading: false,
+      loading: false
     };
   },
   methods: {
@@ -60,35 +59,62 @@ export default {
       if (!file) {
         return alert("Please add media to your post.");
       }
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("description", this.postDescription)
-      // this.$http.axios({
-      //   method: 'post',
-      //   url: '/api/posts',
-      //   data: formData,
-      //   config: { headers: { 'Content-Type': 'multipart/form-data' } }
-      // })
-      this.$http._post('/posts', formData, null, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+
+      let promiseCaller = undefined;
+      const httpPost = (formData) => {
+        return this.$http
+          ._post("/posts", formData, null, {
+            headers: {
+              "Content-Type": "multipart/form-data"
+            }
+          })
+          .then(
+            function(res) {
+              if (res.success) {
+                // redirect to post detail page
+                return this.$router.push(`/posts/${res.post.id}`);
+              }
+              // todo fix this, and catch size, file type, and other misc errors that aren't being caught on the client side, and display more descriptive error message
+              return alert("We're sorry, we were not able to create your post right now.");
+            }.bind(this)
+          )
+      };
+
+      if (file.type.split("/")[0] === "video") {
+        // pass video file to VideoSnapShot
+        const videoSnap = new VideoSnapshot(file);
+        promiseCaller = () => {
+          return videoSnap.takeSnapshot().then((src) => {
+            return fetch(src)
+            .then(res => res.blob())
+            .then((blob) => {
+              return imageCompression(blob, {
+                maxSizeMb: 2
+              }).then((compressedThumbnailFile) => {
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("description", this.postDescription);
+                formData.append('thumbnailFile', compressedThumbnailFile);
+                return httpPost(formData);
+              })
+            })
+          });
+        };
+      } else {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("description", this.postDescription);
+        promiseCaller = () => httpPost(formData);
+      }
+
+      promiseCaller()
+      .catch(err => {
+        alert("We're sorry, we were not able to create your post right now.");
+        console.log("Error, while trying to create post", err);
       })
-        .then(function (res) {
-          if (res.success) {
-            // redirect to post detail page
-            return this.$router.push(`/posts/${res.post.id}`);
-          }
-          // todo fix this, and catch size, file type, and other misc errors that aren't being caught on the client side, and display more descriptive error message
-          return alert("We're sorry, we were not able to create your post right now.");
-        }.bind(this))
-        .catch((err) => {
-          alert("We're sorry, we were not able to create your post right now.");
-          console.log('Error, while trying to create post', err)
-        })
-        .finally(() => {
-          this.loading = false;
-        })
+      .finally(() => {
+        this.loading = false;
+      });
     }
   }
 };

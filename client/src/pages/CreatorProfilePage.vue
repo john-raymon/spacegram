@@ -54,10 +54,23 @@
           >
             <img
               class="absolute h-full w-full object-cover object-center"
-              v-if="post.file.mimetype.split('/')[0] === 'image'"
+              v-if="post.file.contentType.split('/')[0] === 'image'"
               :src="post.url"
             />
-            <div class="w-full h-full absolute top-0 left-0 flex items-center justify-center">
+            <div
+              v-if="post.file.contentType.split('/')[0] === 'image'"
+              class="w-full h-full absolute top-0 left-0 flex items-center justify-center"
+            >
+              <img
+                class="absolute h-full w-full object-cover object-center opacity-75"
+                :src="post.url"
+              />
+              <img
+                class="absolute h-full w-full object-cover object-center opacity-75"
+                src="@/assets/blurred-image.jpg"
+              />
+            </div>
+            <div v-else class="w-full h-full absolute top-0 left-0 flex items-center justify-center">
               <img
                 class="absolute h-full w-full object-cover object-center opacity-75"
                 src="@/assets/blurred-image.jpg"

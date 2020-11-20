@@ -4,7 +4,7 @@
       <div class="card-post flex flex-col bg-red-100 rounded-lg">
         <div class="w-full overflow-hidden rounded-lg bg-black shadow-lg">
           <img
-            v-if="post.file.mimetype.split('/')[0] === 'image'"
+            v-if="post.file.contentType.split('/')[0] === 'image'"
             :src="post.url"
             width="100%"
           />

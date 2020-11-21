@@ -101,6 +101,7 @@ UserSchema.methods.authSerialize = function() {
     lastLoginAt: new Date(this.lastLoginAt).toUTCString(),
     username: this.username,
     imageFile: this.imageFile,
+    hasConnectedToStripe: (this.stripeExpressUserId ? true : false),
   };
 };
 

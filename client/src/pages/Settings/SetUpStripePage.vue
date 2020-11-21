@@ -76,7 +76,7 @@ export default {
               isAuth: true,
               user: res.user
             });
-            alert('You\re all set-up to start getting paid!');
+            return alert('You\re all set-up to start getting paid!');
           }
           throw Error(res);
         })

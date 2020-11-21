@@ -54,7 +54,7 @@ const routes = [
   {
     name: "set-up-stripe",
     path: "/settings/pay",
-    alias: "/users/stripe/token",
+    alias: ["/users/stripe/token", "/users/stripe/token/dashboard", "/dashboard"],
     component: SetUpStripePage,
     meta: {
       requireUserAuth: true

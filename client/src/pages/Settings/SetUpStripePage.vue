@@ -200,7 +200,7 @@ export default {
     goToStripeDashboard() {
       this.$http._post('/users/stripe/dashboard-link').then((res) => {
         if (res.success) {
-          window.open(res.loginLinkUrl, '_blank');
+          window.location.href = res.loginLinkUrl;
         };
       }).catch((err) => {
         console.log('There was a stripe dashboard error', err);

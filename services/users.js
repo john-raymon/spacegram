@@ -34,6 +34,56 @@ const { multerMiddleware: multerCloudinaryMiddleware, cloudinary } = require("@/
  * TODO: Require users to connect to express before viewing orders/subscriptions
  */
 module.exports = {
+  /**
+   * Get list of paid subscription orders belonging to a creator
+   */
+  getSubscriptionsForCreator: [
+    (req, res, next) => {
+      return Subscription.find({
+        creator: req.user.id,
+      }).populate('creator', ['username', 'id']).populate('subscriber', ['username', 'id', 'firstName', 'lastName', 'imageFile']).exec()
+      .then((subscriptions) => {
+        return res.json({
+          success: true,
+          subscriptions,
+        });
+      })
+      .catch(next);
+    },
+  ],
+  /**
+   * generate a stripe login link for a user connected to stripe, to allow them to access
+   * their Stripe dashboard
+   */
+  createStripeLoginLink: [
+    (req, res, next) => {
+      if (!req.user.stripeExpressUserId) {
+        return next({
+          name: "BadRequest",
+          errorType: 'NOT_CONNECTED_TO_STRIPE',
+          message: "You have not connected to stripe to yet."
+        });
+      };
+      // Generate a unique login link for the associated Stripe account to access their Express dashboard
+      return stripe.accounts
+        .createLoginLink(req.user.stripeExpressUserId, {
+          redirect_url: config.get('baseUrl') + "/dashboard"
+        })
+        .then(loginLink => {
+          // Directly link to the account tab
+          let loginLinkUrl = loginLink.url;
+          if (req.query.account) {
+            loginLinkUrl = loginLink.url + "#/account";
+          }
+          // Retrieve the URL from the response and redirect the user to Stripe
+          return res.json({
+            success: true,
+            loginLinkUrl: loginLinkUrl
+          });
+        })
+        .catch(next);
+    },
+  ],
   getAllPostsForACreator: [
     (req, res, next) => {
       // authorize only the creator or a subscriber

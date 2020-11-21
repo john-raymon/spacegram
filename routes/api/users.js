@@ -22,6 +22,9 @@ router.param(':creatorUserId', function(req, res, next, creatorUserId) {
 
 router.post('/', ...service.create);
 
+router.get('/subscriptions', middleware.sessionRequireUser, ...service.getSubscriptionsForCreator);
+
+router.post('/stripe/dashboard-link', middleware.sessionRequireUser, ...service.createStripeLoginLink)
 // update a user
 router.patch('/', middleware.sessionRequireUser, ...service.update)
 

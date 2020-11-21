@@ -129,7 +129,7 @@ export default {
     };
   },
   components: {
-    PlayIconSvg,
+    PlayIconSvg
   },
   // handles setting Stripe.js #card-element when mounted on DOM
   mounted() {

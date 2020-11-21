@@ -232,6 +232,7 @@ module.exports = {
       if (req.user.stripeExpressUserId) {
         return next({
           name: "BadRequest",
+          errorType: 'ALREADY_CONNECTED_STRIPE',
           message: "You have already connected this account to a Stripe account"
         });
       }
@@ -246,7 +247,7 @@ module.exports = {
             // by default go to login for scope read_only and register for scope read_write.
             // we want register, since we don't expect venue owners/host to
             // initially have Stripe accounts.
-            redirect_uri: config.get('baseUrl') + "/api/users/stripe/token",
+            redirect_uri: config.get('baseUrl') + "/users/stripe/token",
             "suggested_capabilities[]": "transfers",
             "stripe_user[business_type]": "individual",
             "stripe_user[first_name]": req.user.firstName || undefined,
@@ -275,11 +276,6 @@ module.exports = {
         })
     },
   ],
-  /**
-   * Todo: when completing the Stripe Express connection flow
-   * make sure to find all non-destination charged subscriptions, and set-up
-   * transfers for them.
-   */
   //http://localhost:3000/api/user/stripe/token?code=ac_IKwOmijXSS2yluCRiIAxccSIokA3X9W1&state=8613ca933f43a71b15fe26b8107df4f653506a60817a49ee6e6a4eff6c52ac41392844a51cd42e903f910416bf75ec98
   handleRedirectUri: [
     (req, res, next) => {
@@ -322,9 +318,12 @@ module.exports = {
                   return subscription.save();
                 }).catch(console.log('silienty swallow this error'));
               })
+              const _compare = req.user.authSerialize();
+              const userObj = user.authSerialize();
               return res.json({
                 success: true,
-                message: "Your Stripe account has been successfully connected!"
+                message: "Your Stripe account has been successfully connected!",
+                user: userObj,
               });
             })
         })

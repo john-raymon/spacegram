@@ -5,6 +5,18 @@
     </h1>
     <ul class="w-full space-y-4 text-base tracking-wider text-white">
       <li tabIndex="0">
+        <router-link to="/settings/pay" class="settings-item">
+          <div class="flex items-center">
+            <p>
+              {{ userAuth.user.hasConnectedToStripe ? 'Manage your revenue & payments' : 'Set-up your account for pay-outs' }}
+            </p>
+          </div>
+          <div class="w-6 h-6">
+            <RightArrowIcon />
+          </div>
+        </router-link>
+      </li>
+      <li tabIndex="0">
         <router-link to="/settings/password" class="settings-item">
           <div class="flex items-center">
             <div class="w-5 h-5 mr-4">

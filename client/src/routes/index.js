@@ -10,6 +10,7 @@ import CreatePostPage from "@/pages/CreatePostPage";
 import SettingsPage from "@/pages/SettingsPage";
 import ChangePasswordPage from "@/pages/Settings/ChangePasswordPage";
 import UpdateAccountInformation from "@/pages/Settings/UpdateAccountInformation";
+import SetUpStripePage from "@/pages/Settings/SetUpStripePage";
 import store from "@/vuex";
 
 const routes = [
@@ -46,6 +47,15 @@ const routes = [
     name: "change-password-page",
     path: "/settings/password",
     component: ChangePasswordPage,
+    meta: {
+      requireUserAuth: true
+    }
+  },
+  {
+    name: "set-up-stripe",
+    path: "/settings/pay",
+    alias: "/users/stripe/token",
+    component: SetUpStripePage,
     meta: {
       requireUserAuth: true
     }

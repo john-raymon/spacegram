@@ -13,7 +13,7 @@
           View your payout balance & history
         </button>
       </div>
-      <table class="table-auto w-full text-white text-left mt-6">
+      <table class="hidden md:table table-auto w-full text-white text-left mt-6">
         <thead class="text-lg">
           <tr>
             <th>Order date</th>
@@ -44,6 +44,32 @@
               ${{ ((s.priceInCents / 100) * 0.8).toFixed(2) }}
             </td>
             <td class="text-right">${{ (s.priceInCents / 100).toFixed(2) }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <table class="table md:hidden table-fixed w-full text-white text-left mt-4">
+        <thead class="text-xs w-full overflow-scroll space-x-2">
+          <tr>
+            <th>Date</th>
+            <th>Customer</th>
+            <th class="text-right">Earned</th>
+            <th class="text-right">Total</th>
+          </tr>
+        </thead>
+        <tbody class="bg-gray-900 text-xs">
+          <tr v-for="s in subscriptions" :key="s.confirmationCode">
+            <td class="px-1">{{getformattedExpDate(s.expires)}}</td>
+            <td class="px-1">
+              <router-link
+                :to="`/creator/${s.subscriber._id}`"
+              >
+                {{s.subscriber.username}}
+              </router-link>
+            </td>
+            <td class="text-right px-1">
+              ${{ ((s.priceInCents / 100) * 0.8).toFixed(2) }}
+            </td>
+            <td class="text-right px-1">${{ (s.priceInCents / 100).toFixed(2) }}</td>
           </tr>
         </tbody>
       </table>

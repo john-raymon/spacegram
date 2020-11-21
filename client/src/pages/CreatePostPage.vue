@@ -33,7 +33,7 @@ import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
 import "filepond-plugin-media-preview/dist/filepond-plugin-media-preview.min.css";
 import "filepond/dist/filepond.min.css";
-import VideoSnapshot from 'video-snapshot';
+import VideoSnapshot from "video-snapshot";
 import imageCompression from "browser-image-compression";
 
 export default {
@@ -61,7 +61,7 @@ export default {
       }
 
       let promiseCaller = undefined;
-      const httpPost = (formData) => {
+      const httpPost = formData => {
         return this.$http
           ._post("/posts", formData, null, {
             headers: {
@@ -77,27 +77,27 @@ export default {
               // todo fix this, and catch size, file type, and other misc errors that aren't being caught on the client side, and display more descriptive error message
               return alert("We're sorry, we were not able to create your post right now.");
             }.bind(this)
-          )
+          );
       };
 
       if (file.type.split("/")[0] === "video") {
         // pass video file to VideoSnapShot
         const videoSnap = new VideoSnapshot(file);
         promiseCaller = () => {
-          return videoSnap.takeSnapshot().then((src) => {
+          return videoSnap.takeSnapshot().then(src => {
             return fetch(src)
-            .then(res => res.blob())
-            .then((blob) => {
-              return imageCompression(blob, {
-                maxSizeMb: 2
-              }).then((compressedThumbnailFile) => {
-                const formData = new FormData();
-                formData.append("file", file);
-                formData.append("description", this.postDescription);
-                formData.append('thumbnailFile', compressedThumbnailFile);
-                return httpPost(formData);
-              })
-            })
+              .then(res => res.blob())
+              .then(blob => {
+                return imageCompression(blob, {
+                  maxSizeMb: 2
+                }).then(compressedThumbnailFile => {
+                  const formData = new FormData();
+                  formData.append("file", file);
+                  formData.append("description", this.postDescription);
+                  formData.append("thumbnailFile", compressedThumbnailFile);
+                  return httpPost(formData);
+                });
+              });
           });
         };
       } else {
@@ -108,13 +108,13 @@ export default {
       }
 
       promiseCaller()
-      .catch(err => {
-        alert("We're sorry, we were not able to create your post right now.");
-        console.log("Error, while trying to create post", err);
-      })
-      .finally(() => {
-        this.loading = false;
-      });
+        .catch(err => {
+          alert("We're sorry, we were not able to create your post right now.");
+          console.log("Error, while trying to create post", err);
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     }
   }
 };

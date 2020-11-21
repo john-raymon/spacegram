@@ -1,9 +1,52 @@
 <template>
   <div class="w-full">
     <div v-if="stripeAccountConnected" class="w-full">
-      <h2 class="text-white mt-6">
-        Manage & track your payments/revenue.
-      </h2>
+      <div class="flex justify-between flex-wrap">
+        <h1 class="text-white mt-6">
+          Manage & track your earnings
+        </h1>
+        <button
+          :disabled="loading"
+          @click="goToStripeDashboard"
+          class="cursor-pointer w-full md:w-1/2 base-button text-sm text-center my-4"
+        >
+          View your payout balance & history
+        </button>
+      </div>
+      <table class="table-auto w-full text-white text-left mt-6">
+        <thead class="text-lg">
+          <tr>
+            <th>Order date</th>
+            <th>Customer username</th>
+            <th>Customer ID</th>
+            <th>Amount earned</th>
+            <th class="text-right">Subscription total</th>
+          </tr>
+        </thead>
+        <tbody class="bg-gray-900">
+          <tr v-for="s in subscriptions" :key="s.confirmationCode">
+            <td>{{getformattedExpDate(s.expires)}}</td>
+            <td>
+              <router-link
+                :to="`/creator/${s.subscriber._id}`"
+              >
+                {{s.subscriber._id}}
+              </router-link>
+            </td>
+            <td>
+              <router-link
+                :to="`/creator/${s.subscriber._id}`"
+              >
+                {{s.subscriber.username}}
+              </router-link>
+            </td>
+            <td>
+              ${{ ((s.priceInCents / 100) * 0.8).toFixed(2) }}
+            </td>
+            <td class="text-right">${{ (s.priceInCents / 100).toFixed(2) }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div v-else class="w-full">
       <template v-if="!redirected">
@@ -40,10 +83,28 @@ export default {
     return {
       loading: false,
       redirected: false,
-      stripeAccountConnected: false
+      stripeAccountConnected: false,
+      subscriptions: [],
     };
   },
   watch: {
+    stripeAccountConnected: {
+      handler(val, oldVal) {
+        if (val) {
+          // fetch subscriptions
+          this.$http._get('/users/subscriptions')
+            .then((res) => {
+              if (res.success) {
+                this.subscriptions = res.subscriptions;
+              }
+            })
+            .catch((err) => {
+              console.log('unable to fetch subscriptions');
+            });
+        };
+      },
+      immediate: true,
+    },
     $route: {
       handler(val, oldVal) {
         if (val.query.code && val.query.state && !this.userAuth.user.hasConnectedToStripe) {
@@ -106,7 +167,24 @@ export default {
         .finally(() => {
           this.loading = false;
         });
-    }
+    },
+    /**
+     * fetch Stripe login link and open in new tab
+     */
+    goToStripeDashboard() {
+      this.$http._post('/users/stripe/dashboard-link').then((res) => {
+        if (res.success) {
+          window.open(res.loginLinkUrl, '_blank');
+        };
+      }).catch((err) => {
+        console.log('There was a stripe dashboard error', err);
+        alert('Could not connect to Stripe.')
+      })
+    },
+    getformattedExpDate(date) {
+      const options = { year: "numeric", month: "long", day: "numeric" };
+      return new Date(date).toLocaleDateString(undefined, options);
+    },
   }
 };
 </script>

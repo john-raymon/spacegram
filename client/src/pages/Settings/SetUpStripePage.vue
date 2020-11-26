@@ -17,8 +17,8 @@
         <thead class="text-lg">
           <tr>
             <th>Order date</th>
-            <th>Customer username</th>
             <th>Customer ID</th>
+            <th>Customer username</th>
             <th>Amount earned</th>
             <th class="text-right">Subscription total</th>
           </tr>
@@ -81,7 +81,7 @@
         </h1>
         <p class="py-2 text-white text-sm">
           We use Stripe to payout your revenue from your OnlyInsta.
-        </p>
+        </p>ig
         <button
           :disabled="loading"
           @click="startStripeFlow"

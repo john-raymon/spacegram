@@ -10,11 +10,20 @@
           />
           <video v-else class="w-full" :src="post.url" controls></video>
         </div>
-        <div class="flex items-center justify-between px-8">
-          <p v-if="post.description" class="text-black text-sm pr-4">
-            {{ post.description }}
-          </p>
-          <div class="flex items-center py-2">
+        <div class="flex items-center justify-between px-8 w-full">
+          <div class="flex flex-col w-1/2">
+            <div class="flex items-center space-x-1">
+              <button class="w-8 h-8 text-red-500 fill-current focus:outline-none focus:text-red" @click="toggleLike">
+                <HeartFilledSvg v-if="hasLiked" />
+                <HeartSvg v-else />
+              </button>
+              <p class="text-sm text-black items-center">{{ post.likes.length }} likes</p>
+            </div>
+            <p v-if="post.description" class="text-black text-sm pr-4">
+              {{ post.description }}
+            </p>
+          </div>
+          <div class="w-auto py-2 flex items-center float-right">
             <p class="mr-2 font-light text-black text-xs">
               Created by
             </p>
@@ -27,7 +36,7 @@
             </router-link> -->
             <router-link
               :to="`/creator/${creator.id}`"
-              class="relative w-12 h-auto bg-red-200 rounded-full mb-2 mr-2"
+              class="relative w-12 h-auto bg-white rounded-full mb-2 mr-2"
             >
               <div
                 class="relative w-full padding-bottom-full rounded-full bg-red-200 overflow-hidden"
@@ -53,20 +62,47 @@
   </div>
 </template>
 <script>
+import HeartSvg from '@/assets/svgs/heart-icon-svg.svg';
+import HeartFilledSvg from '@/assets/svgs/filled-heart-icon.svg';
+import { mapState } from "vuex";
+
 export default {
   name: "PostDetailPage",
   data() {
     return {
       loading: null,
       creator: null,
-      post: null
+      post: null,
     };
+  },
+  components: {
+    HeartSvg,
+    HeartFilledSvg,
+  },
+  computed: {
+    ...mapState(['userAuth']),
+    hasLiked() {
+      return this.post && this.post.likes && this.post.likes.find(l => l._id === this.userAuth.user.id);
+    },
   },
   created() {
     // fetch post
     this.fetchPost();
   },
   methods: {
+    toggleLike() {
+      const postId = this.$route.params.id;
+      this.$http._post(`/posts/${postId}/toggle-like`)
+        .then((res) => {
+          if (res.success) {
+            this.post.likes = res.likes;
+          }
+        })
+        .catch((error) => {
+          console.log('there was an eror when attempting to toggle the like on this post', error);
+        })
+      // make request to like post
+    },
     fetchPost() {
       const postId = this.$route.params.id;
       this.loading = true;

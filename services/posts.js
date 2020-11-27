@@ -33,6 +33,49 @@ const mapSignedUrlsToPost = (posts) => posts.map((post) => {
 module.exports = {
   postGetSignedUrl,
   mapSignedUrlsToPost,
+  toggleLikePost: [
+    (req, res, next) => {
+      // check if user is subscribed
+      // only give authorization to user of post
+      if (req.user.id !== req.post.user.id) {
+        return Subscription.findOne({
+          creator: req.post.user.id,
+          subscriber: req.user.id,
+          expires: {
+            $gte: new Date(),
+          }
+        })
+        .then((subscription) => {
+          if (!subscription) {
+            return next({
+              name: "ForbiddenError",
+            })
+          }
+          if (req.post.likes.includes(req.user.id)) {
+            req.post.likes.remove(req.user.id);
+          } else {
+            req.post.likes.push(req.user.id);
+          }
+          return req.post.save()
+            .then((post) => post.populate('likes',  ['username', 'id', 'firstName', 'lastName', 'imageFile']).execPopulate())
+            .then((post) => {
+              return res.json({ success: true, likes: post.likes })
+            })
+        }).catch(next);
+      }
+      if (req.post.likes.includes(req.user.id)) {
+        req.post.likes.remove(req.user.id);
+      } else {
+        req.post.likes.push(req.user.id);
+      }
+      req.post.save()
+        .then((post) => post.populate('likes',  ['username', 'id', 'firstName', 'lastName', 'imageFile']).execPopulate())
+        .then((post) => {
+          return res.json({ success: true, likes: post.likes })
+        })
+        .catch(next);
+    },
+  ],
   getPostFeed: [
     (req, res, next) => {
       /**
@@ -60,7 +103,9 @@ module.exports = {
             })
           }
           const postFindQuery = following.length > 1 ? ({ $or: following.map(s => ({ user: s.creator })) }) : ({  user: following[0].creator });
-          return Post.find(postFindQuery).sort({ "createdAt": -1 }).populate('user', ['username', 'id', 'firstName', 'lastName', 'imageFile'])
+          return Post.find(postFindQuery).sort({ "createdAt": -1 })
+          .populate('user', ['username', 'id', 'firstName', 'lastName', 'imageFile'])
+          .populate('likes', ['username', 'id', 'firstName', 'lastName', 'imageFile'])
           .exec()
             .then((posts) => {
               return res.json({
@@ -92,13 +137,20 @@ module.exports = {
               name: "ForbiddenError",
             })
           }
-          return res.json({ success: true, post: { ...req.post.toJSON(), url: postGetSignedUrl(req.post.file.get('key')) }, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '', imageFile: req.post.user.imageFile } })
+          return req.post.populate('likes', ['username', 'id', 'firstName', 'lastName', 'imageFile']).execPopulate();
+        })
+        .then((post) => {
+          return res.json({ success: true, post: { ...post.toJSON(), url: postGetSignedUrl(post.file.get('key')) }, creator: { id: post.user.id, firstName: post.user.firstName || '', lastName: post.user.lastName || '', username: post.user.username || '', imageFile: post.user.imageFile } })
         })
         .catch(next)
       }
+      return req.post.populate('likes', ['username', 'id', 'firstName', 'lastName', 'imageFile']).execPopulate()
+        .then((post) => {
+          return res.json({ success: true, post: { ...post.toJSON(), url: postGetSignedUrl(post.file.get('key')) }, creator: { id: post.user.id, firstName: post.user.firstName || '', lastName: post.user.lastName || '', username: post.user.username || '', imageFile: post.user.imageFile } })
+        })
+        .catch(next);
       // return here, since the creator is attempting to read their post hence
       // no need to check for a subscription
-      return res.json({ success: true, post: { ...req.post.toJSON(), url: postGetSignedUrl(req.post.file.get('key')) }, creator: { id: req.post.user.id, firstName: req.post.user.firstName || '', lastName: req.post.user.lastName || '', username: req.post.user.username || '', imageFile: req.post.user.imageFile } })
     },
   ],
   /**

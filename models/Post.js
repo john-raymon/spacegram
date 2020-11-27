@@ -14,7 +14,8 @@ const PostSchema = mongoose.Schema(
     thumbnailFile: {
       type: Map,
       default: null,
-    }
+    },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );
@@ -26,6 +27,7 @@ PostSchema.methods.jsonSerialize = function() {
     file,
     deleted,
     description,
+    likes,
   } = this;
 
   return {
@@ -34,6 +36,7 @@ PostSchema.methods.jsonSerialize = function() {
     file,
     deleted,
     description,
+    likes,
   };
 }
 

@@ -25,24 +25,18 @@
         </thead>
         <tbody class="bg-gray-900">
           <tr v-for="s in subscriptions" :key="s.confirmationCode">
-            <td>{{getformattedExpDate(s.expires)}}</td>
+            <td>{{ getformattedExpDate(s.expires) }}</td>
             <td>
-              <router-link
-                :to="`/creator/${s.subscriber._id}`"
-              >
-                {{s.subscriber._id}}
+              <router-link :to="`/creator/${s.subscriber._id}`">
+                {{ s.subscriber._id }}
               </router-link>
             </td>
             <td>
-              <router-link
-                :to="`/creator/${s.subscriber._id}`"
-              >
-                {{s.subscriber.username}}
+              <router-link :to="`/creator/${s.subscriber._id}`">
+                {{ s.subscriber.username }}
               </router-link>
             </td>
-            <td>
-              ${{ ((s.priceInCents / 100) * 0.8).toFixed(2) }}
-            </td>
+            <td>${{ ((s.priceInCents / 100) * 0.8).toFixed(2) }}</td>
             <td class="text-right">${{ (s.priceInCents / 100).toFixed(2) }}</td>
           </tr>
         </tbody>
@@ -58,17 +52,13 @@
         </thead>
         <tbody class="bg-gray-900 text-xs">
           <tr v-for="s in subscriptions" :key="s.confirmationCode">
-            <td class="px-1">{{getformattedExpDate(s.expires)}}</td>
+            <td class="px-1">{{ getformattedExpDate(s.expires) }}</td>
             <td class="px-1">
-              <router-link
-                :to="`/creator/${s.subscriber._id}`"
-              >
-                {{s.subscriber.username}}
+              <router-link :to="`/creator/${s.subscriber._id}`">
+                {{ s.subscriber.username }}
               </router-link>
             </td>
-            <td class="text-right px-1">
-              ${{ ((s.priceInCents / 100) * 0.8).toFixed(2) }}
-            </td>
+            <td class="text-right px-1">${{ ((s.priceInCents / 100) * 0.8).toFixed(2) }}</td>
             <td class="text-right px-1">${{ (s.priceInCents / 100).toFixed(2) }}</td>
           </tr>
         </tbody>
@@ -81,7 +71,8 @@
         </h1>
         <p class="py-2 text-white text-sm">
           We use Stripe to payout your revenue from your OnlyInsta.
-        </p>ig
+        </p>
+        ig
         <button
           :disabled="loading"
           @click="startStripeFlow"
@@ -110,7 +101,7 @@ export default {
       loading: false,
       redirected: false,
       stripeAccountConnected: false,
-      subscriptions: [],
+      subscriptions: []
     };
   },
   watch: {
@@ -118,18 +109,19 @@ export default {
       handler(val, oldVal) {
         if (val) {
           // fetch subscriptions
-          this.$http._get('/users/subscriptions')
-            .then((res) => {
+          this.$http
+            ._get("/users/subscriptions")
+            .then(res => {
               if (res.success) {
                 this.subscriptions = res.subscriptions;
               }
             })
-            .catch((err) => {
-              console.log('unable to fetch subscriptions');
+            .catch(err => {
+              console.log("unable to fetch subscriptions");
             });
-        };
+        }
       },
-      immediate: true,
+      immediate: true
     },
     $route: {
       handler(val, oldVal) {
@@ -163,7 +155,7 @@ export default {
               isAuth: true,
               user: res.user
             });
-            return alert('You\re all set-up to start getting paid!');
+            return alert("You\re all set-up to start getting paid!");
           }
           throw Error(res);
         })
@@ -198,19 +190,22 @@ export default {
      * fetch Stripe login link and open in new tab
      */
     goToStripeDashboard() {
-      this.$http._post('/users/stripe/dashboard-link').then((res) => {
-        if (res.success) {
-          window.location.href = res.loginLinkUrl;
-        };
-      }).catch((err) => {
-        console.log('There was a stripe dashboard error', err);
-        alert('Could not connect to Stripe.')
-      })
+      this.$http
+        ._post("/users/stripe/dashboard-link")
+        .then(res => {
+          if (res.success) {
+            window.location.href = res.loginLinkUrl;
+          }
+        })
+        .catch(err => {
+          console.log("There was a stripe dashboard error", err);
+          alert("Could not connect to Stripe.");
+        });
     },
     getformattedExpDate(date) {
       const options = { year: "numeric", month: "long", day: "numeric" };
       return new Date(date).toLocaleDateString(undefined, options);
-    },
+    }
   }
 };
 </script>

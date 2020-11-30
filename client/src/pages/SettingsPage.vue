@@ -8,7 +8,11 @@
         <router-link to="/settings/pay" class="settings-item">
           <div class="flex items-center">
             <p>
-              {{ userAuth.user.hasConnectedToStripe ? 'Manage your revenue & payments' : 'Set-up your account for pay-outs' }}
+              {{
+                userAuth.user.hasConnectedToStripe
+                  ? "Manage your revenue & payments"
+                  : "Set-up your account for pay-outs"
+              }}
             </p>
           </div>
           <div class="w-6 h-6">

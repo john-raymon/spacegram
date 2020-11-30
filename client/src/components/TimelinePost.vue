@@ -2,7 +2,7 @@
   <div
     v-if="statePost"
     @click="goToPostDetail"
-    class="card-post flex flex-col bg-red-100 rounded-lg w-full"
+    class="cursor-pointer card-post flex flex-col bg-red-100 rounded-lg w-full"
   >
     <div class="w-full overflow-hidden rounded-lg bg-black shadow-lg">
       <img
@@ -26,7 +26,7 @@
         </div>
       </div>
     </div>
-    <div class="flex items-center justify-between px-3 md:px-8 w-full">
+    <div class="flex items-center justify-between py-2 px-3 md:px-8 w-full">
       <div class="flex flex-col w-1/2">
         <div class="flex items-center space-x-1">
           <button
@@ -36,7 +36,7 @@
             <HeartFilledSvg v-if="hasLiked" />
             <HeartSvg v-else />
           </button>
-          <p @click="toggleLikesModal" class="cursor-pointer text-sm text-black items-center">
+          <p @click.stop="toggleLikesModal" class="cursor-pointer text-sm text-black items-center">
             {{postLikesText}}
           </p>
         </div>
@@ -44,32 +44,40 @@
           {{ statePost.description }}
         </p>
       </div>
-      <div class="w-auto py-2 flex items-center float-right">
-        <p class="mr-2 font-light text-black text-xs">
-          Created by
-        </p>
-        <router-link
-          :to="`/creator/${post.user.id}`"
-          class="relative w-12 h-auto bg-white rounded-full mb-2 mr-2"
-        >
-          <div
-            class="relative w-full padding-bottom-full rounded-full bg-red-200 overflow-hidden"
+      <div class="flex items-center py-2">
+        <div class="w-auto flex items-center" @click.stop>
+          <p class="mr-2 font-light text-black text-xs">
+            Created by
+          </p>
+          <router-link
+            :to="`/creator/${statePost.user._id}`"
+            class="relative w-12 h-auto bg-white rounded-full mb-2 mr-2"
           >
-            <img
-              v-if="post.user.imageFile"
-              class="absolute w-full h-full object-cover"
-              :src="post.user.imageFile.url"
-            />
-            <span
-              v-else
-              class="absolute uppercase flex items-center justify-center w-full h-full text-black"
+            <div
+              class="relative w-full padding-bottom-full rounded-full bg-red-200 overflow-hidden"
             >
-              {{ post.user.username[0] }}
-              {{ post.user.username[1] }}
-            </span>
+              <img
+                v-if="statePost.user.imageFile"
+                class="absolute w-full h-full object-cover"
+                :src="statePost.user.imageFile.url"
+              />
+              <span
+                v-else
+                class="absolute uppercase flex items-center justify-center w-full h-full text-black"
+              >
+                {{ statePost.user.username[0] }}
+                {{ statePost.user.username[1] }}
+              </span>
+            </div>
+          </router-link>
+        </div>
+        <button @click.stop class="w-5 h-5 text-black fill-current">
+          <div class="w-5 h-5">
+            <EllipsisIconSvg />
           </div>
-        </router-link>
+        </button>
       </div>
+
     </div>
     <LikesModal @close-modal="toggleLikesModal" v-if="showLikesModal">
       <template v-slot:heading>
@@ -122,6 +130,7 @@ import HeartFilledSvg from "@/assets/svgs/filled-heart-icon.svg";
 import { mapState } from "vuex";
 import Modal from "@/components/Modal";
 import PlayIconSvg from "@/assets/svgs/play-icon-svg.svg";
+import EllipsisIconSvg from '@/assets/svgs/ellipsis-icon-svg.svg';
 
 export default {
   name: "TimelinePost",
@@ -145,6 +154,7 @@ export default {
     HeartFilledSvg,
     LikesModal: Modal,
     PlayIconSvg,
+    EllipsisIconSvg,
   },
   computed: {
     ...mapState(["userAuth"]),
@@ -172,7 +182,6 @@ export default {
     },
     // TODO: move toggleLike like stuff into reusable mixin
     toggleLike(e) {
-      e.stopPropagation();
       if (!this.statePost) {
         return;
       }

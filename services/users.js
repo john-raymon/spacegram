@@ -86,18 +86,62 @@ module.exports = {
   ],
   getAllPostsForACreator: [
     (req, res, next) => {
-      // authorize only the creator or a subscriber
-      // TODO: since iterating through each post to generate a signed url
-      // is expensive, we need use the cloudfront cookie protected urls
-      // instead of signed protected urls
-      const getAllCreatorPost = () => Post.find({
-        user: req.creatorUser.id,
-      }).exec().then((posts) => {
-        const postWithSignedUrls = postService.mapSignedUrlsToPost(posts);
-        return {
+      if (req.userLoggedIn) {
+        // authorize only the creator or a subscriber
+        // TODO: since iterating through each post to generate a signed url
+        // is expensive, we need use the cloudfront cookie protected urls
+        // instead of signed protected urls
+        const getAllCreatorPost = () => Post.find({
+          user: req.creatorUser.id,
+        }).exec().then((posts) => {
+          const postWithSignedUrls = postService.mapSignedUrlsToPost(posts);
+          return {
+            monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
+            success: true,
+            posts: postWithSignedUrls,
+            creator: {
+              firstName: req.creatorUser.firstName || '',
+              lastName: req.creatorUser.lastName || '',
+              username: req.creatorUser.username || '',
+              id: req.creatorUser.id,
+              imageFile: req.creatorUser.imageFile
+            }
+          };
+        });
+        if (req.creatorUser.id === req.user.id) {
+          // return creator posts to creator
+          return getAllCreatorPost().then((postRes) => {
+            return res.json(postRes)
+          });
+        } else {
+          // find an active subscription to allow access to the creators posts
+          return Subscription
+            .findOne({
+              subscriber: req.user.id,
+              creator: req.creatorUser.id,
+              expires: {
+                $gte: new Date(),
+              }
+            })
+            .then((subscription) => {
+              if (!subscription) {
+                return res.json({ following: false, creator: { monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || '', id: req.creatorUser.id, imageFile: req.creatorUser.imageFile }, name: "ForbiddenError" })
+              }
+              return getAllCreatorPost().then((postRes) => {
+                return res.json({...postRes, subscription })
+              })
+            })
+            .catch(() => next({ name: "ForbiddenError" }))
+        }
+        /**
+         * TODO: add pagination support in later version
+         */
+      } else {
+        return res.json({
+          following: false,
           monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
           success: true,
-          posts: postWithSignedUrls,
+          posts: [],
           creator: {
             firstName: req.creatorUser.firstName || '',
             lastName: req.creatorUser.lastName || '',
@@ -105,36 +149,8 @@ module.exports = {
             id: req.creatorUser.id,
             imageFile: req.creatorUser.imageFile
           }
-        };
-      });
-      if (req.creatorUser.id === req.user.id) {
-        // return creator posts to creator
-        return getAllCreatorPost().then((postRes) => {
-          return res.json(postRes)
         });
-      } else {
-        // find an active subscription to allow access to the creators posts
-        return Subscription
-          .findOne({
-            subscriber: req.user.id,
-            creator: req.creatorUser.id,
-            expires: {
-              $gte: new Date(),
-            }
-          })
-          .then((subscription) => {
-            if (!subscription) {
-              return res.json({ creator: { monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || '', id: req.creatorUser.id, imageFile: req.creatorUser.imageFile }, name: "ForbiddenError" })
-            }
-            return getAllCreatorPost().then((postRes) => {
-              return res.json({...postRes, subscription })
-            })
-          })
-          .catch(() => next({ name: "ForbiddenError" }))
       }
-      /**
-       * TODO: add pagination support in later version
-       */
     },
   ],
   aggregateFollowersFollowingList: [

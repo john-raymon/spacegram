@@ -35,7 +35,8 @@ router.get('/', middleware.sessionRequireUser, function(req, res, next) {
 });
 
 // fetch all of creator user's post, authorizing only the creator or a subscriber user
-router.get('/:creatorUserId/posts', middleware.sessionRequireUser, ...service.getAllPostsForACreator)
+// if the user is not logged in, we just return the creator profile information
+router.get('/:creatorUserId/posts', middleware.optionalSessionRequireUser, ...service.getAllPostsForACreator)
 
 // subscribe to a creator, sending over a stripe token
 router.post('/:creatorUserId/subscribe', middleware.sessionRequireUser, ...service.subscribeToAUser);

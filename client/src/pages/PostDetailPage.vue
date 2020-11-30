@@ -10,7 +10,7 @@
           />
           <video v-else class="w-full" :src="post.url" controls></video>
         </div>
-        <div class="flex items-center justify-between px-3 md:px-8 w-full">
+        <div class="flex items-center justify-between py-2 px-3 md:px-8 w-full">
           <div class="flex flex-col w-1/2">
             <div class="flex items-center space-x-1">
               <button
@@ -28,38 +28,45 @@
               {{ post.description }}
             </p>
           </div>
-          <div class="w-auto py-2 flex items-center float-right">
-            <p class="mr-2 font-light text-black text-xs">
-              Created by
-            </p>
-            <!-- <router-link
-              :to="`/creator/${creator.id}`"
-              class="capitalize text-xs hover:opacity-75 font-black block flex items-center justify-center my-3 p-2 bg-red-200 cursor-pointer rounded-full w-12 h-12"
-            >
-              {{ post.user.username[0] }}
-              {{ post.user.username[1] }}
-            </router-link> -->
-            <router-link
-              :to="`/creator/${creator.id}`"
-              class="relative w-12 h-auto bg-white rounded-full mb-2 mr-2"
-            >
-              <div
-                class="relative w-full padding-bottom-full rounded-full bg-red-200 overflow-hidden"
+          <div class="py-2 flex items-center">
+            <div class="w-auto flex items-center">
+              <p class="mr-2 font-light text-black text-xs">
+                Created by
+              </p>
+              <!-- <router-link
+                :to="`/creator/${creator.id}`"
+                class="capitalize text-xs hover:opacity-75 font-black block flex items-center justify-center my-3 p-2 bg-red-200 cursor-pointer rounded-full w-12 h-12"
               >
-                <img
-                  v-if="creator.imageFile"
-                  class="absolute w-full h-full object-cover"
-                  :src="creator.imageFile.url"
-                />
-                <span
-                  v-else
-                  class="absolute uppercase flex items-center justify-center w-full h-full text-black"
+                {{ post.user.username[0] }}
+                {{ post.user.username[1] }}
+              </router-link> -->
+              <router-link
+                :to="`/creator/${creator.id}`"
+                class="relative w-12 h-auto bg-white rounded-full mb-2 mr-2"
+              >
+                <div
+                  class="relative w-full padding-bottom-full rounded-full bg-red-200 overflow-hidden"
                 >
-                  {{ creator.username[0] }}
-                  {{ creator.username[1] }}
-                </span>
+                  <img
+                    v-if="creator.imageFile"
+                    class="absolute w-full h-full object-cover"
+                    :src="creator.imageFile.url"
+                  />
+                  <span
+                    v-else
+                    class="absolute uppercase flex items-center justify-center w-full h-full text-black"
+                  >
+                    {{ creator.username[0] }}
+                    {{ creator.username[1] }}
+                  </span>
+                </div>
+              </router-link>
+            </div>
+            <button @click.stop class="w-5 h-5 text-black fill-current">
+              <div class="w-5 h-5">
+                <EllipsisIconSvg />
               </div>
-            </router-link>
+            </button>
           </div>
         </div>
       </div>
@@ -114,6 +121,7 @@ import HeartSvg from "@/assets/svgs/heart-icon-svg.svg";
 import HeartFilledSvg from "@/assets/svgs/filled-heart-icon.svg";
 import { mapState } from "vuex";
 import Modal from "@/components/Modal";
+import EllipsisIconSvg from '@/assets/svgs/ellipsis-icon-svg.svg';
 
 export default {
   name: "PostDetailPage",
@@ -128,7 +136,8 @@ export default {
   components: {
     HeartSvg,
     HeartFilledSvg,
-    LikesModal: Modal
+    LikesModal: Modal,
+    EllipsisIconSvg,
   },
   computed: {
     ...mapState(["userAuth"]),

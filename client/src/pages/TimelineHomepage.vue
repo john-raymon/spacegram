@@ -1,6 +1,6 @@
 <template>
   <div class="pb-6 w-full flex flex-col items-center mt-4">
-    <ul class="space-y-6 max-w-lg w-full">
+    <ul class="space-y-6 max-w-lg w-full" v-if="postFeed && postFeed.length">
       <li v-for="post in postFeed" :key="post._id" class="w-full">
         <!-- <router-link
           :to="`/posts/${post._id}`"
@@ -63,12 +63,21 @@
         <TimelinePost :post="post" />
       </li>
     </ul>
+    <div v-else class='mx-auto text-center text-white flex flex-col items-center py-6'>
+      <div class='w-10 h-10 text-white fill-current'>
+        <InfoIconSvg />
+      </div>
+      <h2>
+        No post available.
+      </h2>
+    </div>
   </div>
 </template>
 <script>
 import { mapActions } from "vuex";
-// import PlayIconSvg from "@/assets/svgs/play-icon-svg.svg";
+
 import TimelinePost from "@/components/TimelinePost";
+import InfoIconSvg from "@/assets/svgs/info-icon-svg.svg";
 
 export default {
   name: "TimelineHomepage",
@@ -78,8 +87,8 @@ export default {
     };
   },
   components: {
-    // PlayIconSvg,
     TimelinePost,
+    InfoIconSvg,
   },
   created() {
     // fetch post feed

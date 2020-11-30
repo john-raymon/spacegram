@@ -55,9 +55,9 @@
         </div>
       </div>
 
-      <div class="text-gray-dark mt-6">
+      <div class="text-white mt-6">
         Already have an account?
-        <router-link class="no-underline border-b border-blue-500 text-blue-500" to="/sign-in">
+        <router-link class="no-underline border-b border-blue-500 text-blue-500" :to="signInRoute">
           Sign in here
         </router-link>
       </div>
@@ -84,12 +84,24 @@ export default {
     userAuth: {
       handler(val) {
         if (val.isAuth) {
-          const redirectRouteName = this.$route.query.redirect || "home";
-          return this.$router.push({ name: redirectRouteName, query: this.$route.query });
+          const redirectRouteName = this.$route.query.redirect || "timeline";
+          return this.$router.push({
+            name: redirectRouteName,
+            query: { ...this.$route.query, redirectParams: undefined, redirect: undefined },
+            params: this.$route.query.redirectParams && JSON.parse(this.$route.query.redirectParams)
+          });
         }
       },
       immediate: true
     }
+  },
+  computed: {
+    signInRoute() {
+      return {
+        name: "sign-in",
+        query: { ...this.$route.query }
+      };
+    },
   },
   methods: {
     ...mapActions(["updateUserAuth"]),

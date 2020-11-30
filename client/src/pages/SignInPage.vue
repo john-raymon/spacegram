@@ -21,7 +21,7 @@
 
       <div class="text-gray-dark mt-6 tracking-wider text-sm">
         Don't have an OnlyInsta account?
-        <router-link class="no-underline border-b border-blue-500 text-blue-500" to="/sign-up">
+        <router-link class="no-underline border-b border-blue-500 text-blue-500" :to="signUpRoute">
           Sign up for free here
         </router-link>
       </div>
@@ -54,6 +54,14 @@ export default {
       },
       immediate: true
     }
+  },
+  computed: {
+    signUpRoute() {
+      return {
+        name: "sign-up",
+        query: { ...this.$route.query }
+      };
+    },
   },
   methods: {
     ...mapActions(["updateUserAuth"]),

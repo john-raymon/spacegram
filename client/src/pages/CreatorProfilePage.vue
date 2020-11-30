@@ -51,64 +51,86 @@
         </template>
       </p>
     </div>
-    <ul v-if="following" class="flex flex-wrap w-full">
-      <li
-        class="w-1/3 cursor-pointer hover:opacity-75"
-        v-for="post in computedPosts"
-        :key="post._id"
-      >
-        <div class="p-1 md:p-4">
+    <template v-if="creatorNotFound">
+     <p class="text-white text-3xl text-center my-4">
+        Sorry, this creator page isn't available.
+      </p>
+    </template>
+    <template v-else-if="!userAuth.user">
+      <div class="flex flex-col max-w-screen-md mx-auto">
+        <p class="text-white text-3xl text-center mb-2">
           <router-link
-            :to="`/posts/${post._id}`"
-            class="block relative padding-bottom-full overflow-hidden"
-          >
-            <div
-              v-if="post.file.contentType.split('/')[0] === 'image'"
-              class="w-full h-full absolute top-0 left-0 flex items-center justify-center"
+          :to="signInRoute"
+          class="underline">Sign in</router-link>
+          or
+          <router-link class="underline" :to="signUpRoute">Sign up</router-link>
+          to follow {{ creator && creator.username }}'s page.
+          <span class="block text-white opacity-75 text-sm">
+            (We'll redirect you back here after)
+          </span>
+        </p>
+      </div>
+    </template>
+    <template v-else>
+      <ul v-if="following" class="flex flex-wrap w-full">
+        <li
+          class="w-1/3 cursor-pointer hover:opacity-75"
+          v-for="post in computedPosts"
+          :key="post._id"
+        >
+          <div class="p-1 md:p-4">
+            <router-link
+              :to="`/posts/${post._id}`"
+              class="block relative padding-bottom-full overflow-hidden"
             >
-              <img
-                class="absolute h-full w-full object-cover object-center opacity-75"
-                :src="post.url"
-              />
-            </div>
-            <div
-              v-else
-              class="w-full h-full absolute top-0 left-0 flex items-center justify-center"
-            >
-              <img
-                class="absolute h-full w-full object-cover object-center opacity-75"
-                :src="post.thumbnailUrl"
-              />
               <div
-                class="absolute left-0 top-0 h-full w-full mx-auto flex flex-col items-center justify-center opacity-75"
+                v-if="post.file.contentType.split('/')[0] === 'image'"
+                class="w-full h-full absolute top-0 left-0 flex items-center justify-center"
               >
-                <div class="w-1/4 h-auto fill-current cursor-pointer hover:opacity-50">
-                  <PlayIconSvg />
+                <img
+                  class="absolute w-full object-cover object-center opacity-75"
+                  :src="post.url"
+                />
+              </div>
+              <div
+                v-else
+                class="w-full h-full absolute top-0 left-0 flex items-center justify-center"
+              >
+                <img
+                  class="absolute h-full w-full object-cover object-center opacity-75"
+                  :src="post.thumbnailUrl"
+                />
+                <div
+                  class="absolute left-0 top-0 h-full w-full mx-auto flex flex-col items-center justify-center opacity-75"
+                >
+                  <div class="w-1/4 h-auto fill-current cursor-pointer hover:opacity-50">
+                    <PlayIconSvg />
+                  </div>
                 </div>
               </div>
-            </div>
-          </router-link>
+            </router-link>
+          </div>
+        </li>
+      </ul>
+      <div v-else-if="userAuth.isAuth" class="flex flex-col max-w-screen-md mx-auto">
+        <p class="text-white text-3xl text-center mb-2">
+          Want to follow {{ creator && creator.username }}'s page?
+        </p>
+        <!-- Stripe.js handles populating card-element-->
+        <div class="p-5 bg-gray-900 rounded-lg mb-4">
+          <div id="card-element"></div>
         </div>
-      </li>
-    </ul>
-    <div v-else class="flex flex-col max-w-screen-md mx-auto">
-      <p class="text-white text-3xl text-center mb-2">
-        Want to follow {{ creator && creator.username }}'s page?
-      </p>
-      <!-- Stripe.js handles populating card-element-->
-      <div class="p-5 bg-gray-900 rounded-lg mb-4">
-        <div id="card-element"></div>
+        <button
+          @click="subscribeToCreator"
+          class="text-red-800 font-medium text-md bg-white py-3 px-6 outline-none focus:outline-none focus:bg-red-100 hover:bg-red-100 mx-auto rounded-full"
+        >
+          Subscribe now for $10/month
+        </button>
+        <span class="text-xs text-white text-center block my-4 leading-none"
+          >(no automatic renewals)</span
+        >
       </div>
-      <button
-        @click="subscribeToCreator"
-        class="text-red-800 font-medium text-md bg-white py-3 px-6 outline-none focus:outline-none focus:bg-red-100 hover:bg-red-100 mx-auto rounded-full"
-      >
-        Subscribe now for $10/month
-      </button>
-      <span class="text-xs text-white text-center block my-4 leading-none"
-        >(no automatic renewals)</span
-      >
-    </div>
+    </template>
   </div>
 </template>
 <script>
@@ -125,7 +147,8 @@ export default {
       posts: [],
       subscribeError: "",
       subscription: null,
-      stats: null
+      stats: null,
+      creatorNotFound: false,
     };
   },
   components: {
@@ -141,6 +164,18 @@ export default {
   },
   computed: {
     ...mapState(["userAuth"]),
+    signInRoute() {
+      return {
+        name: "sign-in",
+        query: { ...this.$route.query, redirect: this.$route.name, redirectParams: JSON.stringify(this.$route.params) }
+      };
+    },
+    signUpRoute() {
+      return {
+        name: "sign-up",
+        query: { ...this.$route.query, redirect: this.$route.name, redirectParams: JSON.stringify(this.$route.params) }
+      };
+    },
     formattedExpDate() {
       const options = { year: "numeric", month: "long", day: "numeric" };
       return new Date(this.subscription.expires).toLocaleDateString(undefined, options);
@@ -166,7 +201,7 @@ export default {
               // TODO: store this date globally, so that we can reuse the other computed data dervived
               // from this for other views, instead of making the same request against
               // check if logged-in user's creator-profile, if so, fetch follower, following count
-              if (this.userAuth.user.id === res.creator.id) {
+              if (this.userAuth.user && this.userAuth.user.id === res.creator.id) {
                 // fetch follower count;
                 return this.$http._get("/users/followers-following").then(res => {
                   this.stats = {
@@ -184,9 +219,7 @@ export default {
           }.bind(this)
         )
         .catch(error => {
-          if (error && error.response && error.response.status === 401) {
-            this.logout();
-          }
+          this.creatorNotFound = true;
           // catch unauthenticated error logging out user
           console.log("error while fetch post feed");
         });

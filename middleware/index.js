@@ -26,6 +26,14 @@ const auth = {
       message: "You must sign up or sign in."
     });
   }],
+  optionalSessionRequireUser: [(req, res, next) => {
+    if (req.isAuthenticated()) {
+      req.userLoggedIn = true;
+      return next();
+    }
+    req.userLoggedIn = false;
+    return next();
+  }]
 };
 
 module.exports = auth;

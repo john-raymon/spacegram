@@ -85,14 +85,6 @@ const routes = [
     }
   },
   {
-    name: "creator-profile",
-    path: "/creator/:id",
-    component: CreatorProfilePage,
-    meta: {
-      requireUserAuth: true
-    }
-  },
-  {
     name: "post-detail",
     path: "/post/:id",
     alias: "/posts/:id",
@@ -112,20 +104,11 @@ const routes = [
     component: SignInPage
   },
   {
-    name: "secure",
-    path: "/secure",
-    alias: "/protected",
-    component: {
-      template: `
-        <div>
-          This is a protected page-component
-        </div>
-      `
-    },
-    meta: {
-      requireUserAuth: true
-    }
-  }
+    name: "creator-profile",
+    path: "/creator/:id",
+    alias: "/:id",
+    component: CreatorProfilePage,
+  },
 ];
 
 const router = new VueRouter({

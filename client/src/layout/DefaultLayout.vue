@@ -38,7 +38,7 @@
     </main>
     <div
       v-if="userAuth.isAuth && $route.name !== 'create-post'"
-      class="flex justify-center bottom-0 sticky pb-4 max-w-screen-lg mx-auto"
+      class="bottom-0 sticky pb-4 mx-auto w-20"
     >
       <div
         class="flex items-center justify-center px-2 py-2 md:py-2 px-6 bg-white rounded-full text-white shadow-2xl"

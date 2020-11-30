@@ -10,14 +10,19 @@
           />
           <video v-else class="w-full" :src="post.url" controls></video>
         </div>
-        <div class="flex items-center justify-between px-8 w-full">
+        <div class="flex items-center justify-between px-3 md:px-8 w-full">
           <div class="flex flex-col w-1/2">
             <div class="flex items-center space-x-1">
-              <button class="w-8 h-8 text-red-500 fill-current focus:outline-none focus:text-red" @click="toggleLike">
+              <button
+                class="w-8 h-8 text-red-500 fill-current focus:outline-none focus:text-red"
+                @click="toggleLike"
+              >
                 <HeartFilledSvg v-if="hasLiked" />
                 <HeartSvg v-else />
               </button>
-              <p class="text-sm text-black items-center">{{ post.likes.length }} likes</p>
+              <p @click="toggleLikesModal" class="cursor-pointer text-sm text-black items-center">
+                {{postLikesText}}
+              </p>
             </div>
             <p v-if="post.description" class="text-black text-sm pr-4">
               {{ post.description }}
@@ -58,13 +63,57 @@
           </div>
         </div>
       </div>
+      <LikesModal @close-modal="toggleLikesModal" v-if="showLikesModal">
+        <template v-slot:heading>
+          <h1 class="text-black">
+            Likes
+          </h1>
+        </template>
+        <template v-slot:body>
+          <div class="w-full h-40 overflow-y-scroll">
+            <ul class="inline-flex flex-col space-y-2 w-full mx-auto mt-6" v-if="post && post.likes">
+              <li v-for="like in post.likes" :key="like._id" class="w-full">
+                <router-link
+                  :to="`/creator/${like._id}`"
+                  class="flex hover:opacity:75 focus:opacity-50 items-center text-black w-full p-1"
+                >
+                  <div
+                    class="capitalize text-xs hover:opacity-75 text-left font-black block flex items-center justify-center cursor-pointer rounded-full w-12 h-12"
+                  >
+                    <div
+                      class="relative w-full padding-bottom-full rounded-full bg-red-200 overflow-hidden"
+                    >
+                      <img
+                        v-if="like.imageFile"
+                        class="absolute w-12 h-12 object-cover"
+                        :src="like.imageFile.url"
+                      />
+                      <span
+                        v-else
+                        class="absolute uppercase flex items-center justify-center w-full h-full text-black"
+                      >
+                        {{ like.username[0] }}
+                        {{ like.username[1] }}
+                      </span>
+                    </div>
+                  </div>
+                  <p class="text-sm capitalize text-black pl-4">
+                    {{ like.username }}
+                  </p>
+                </router-link>
+              </li>
+            </ul>
+          </div>
+        </template>
+      </LikesModal>
     </template>
   </div>
 </template>
 <script>
-import HeartSvg from '@/assets/svgs/heart-icon-svg.svg';
-import HeartFilledSvg from '@/assets/svgs/filled-heart-icon.svg';
+import HeartSvg from "@/assets/svgs/heart-icon-svg.svg";
+import HeartFilledSvg from "@/assets/svgs/filled-heart-icon.svg";
 import { mapState } from "vuex";
+import Modal from "@/components/Modal";
 
 export default {
   name: "PostDetailPage",
@@ -73,34 +122,48 @@ export default {
       loading: null,
       creator: null,
       post: null,
+      showLikesModal: false
     };
   },
   components: {
     HeartSvg,
     HeartFilledSvg,
+    LikesModal: Modal
   },
   computed: {
-    ...mapState(['userAuth']),
-    hasLiked() {
-      return this.post && this.post.likes && this.post.likes.find(l => l._id === this.userAuth.user.id);
+    ...mapState(["userAuth"]),
+    postLikesText() {
+      if (this.post && this.post.likes) {
+        return `${this.post.likes.length} like${this.post.likes.length === 1 ? "" : "s"}`;
+      }
+      return '0 likes';
     },
+    hasLiked() {
+      return (
+        this.post && this.post.likes && this.post.likes.find(l => l._id === this.userAuth.user.id)
+      );
+    }
   },
   created() {
     // fetch post
     this.fetchPost();
   },
   methods: {
+    toggleLikesModal() {
+      this.showLikesModal = !this.showLikesModal;
+    },
     toggleLike() {
       const postId = this.$route.params.id;
-      this.$http._post(`/posts/${postId}/toggle-like`)
-        .then((res) => {
+      this.$http
+        ._post(`/posts/${postId}/toggle-like`)
+        .then(res => {
           if (res.success) {
             this.post.likes = res.likes;
           }
         })
-        .catch((error) => {
-          console.log('there was an eror when attempting to toggle the like on this post', error);
-        })
+        .catch(error => {
+          console.log("there was an eror when attempting to toggle the like on this post", error);
+        });
       // make request to like post
     },
     fetchPost() {

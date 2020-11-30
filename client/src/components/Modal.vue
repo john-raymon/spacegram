@@ -29,6 +29,6 @@ export default {
   name: "Modal",
   components: {
     CloseIconSvg
-  }
+  },
 };
 </script>

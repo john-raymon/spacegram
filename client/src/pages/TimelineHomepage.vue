@@ -2,7 +2,7 @@
   <div class="pb-6 w-full flex flex-col items-center mt-4">
     <ul class="space-y-6 max-w-lg w-full">
       <li v-for="post in postFeed" :key="post._id" class="w-full">
-        <router-link
+        <!-- <router-link
           :to="`/posts/${post._id}`"
           class="card-post flex flex-col bg-red-100 rounded-lg w-full"
         >
@@ -28,18 +28,6 @@
               </div>
             </div>
           </div>
-          <!-- <div class="flex items-center px-8">
-            <p class="mr-2 font-light text-xs">
-              Created by
-            </p>
-            <router-link
-              :to="`/creator/${post.user._id}`"
-              class="capitalize text-xs hover:opacity-75 font-black block flex items-center justify-center my-3 p-2 bg-red-200 cursor-pointer rounded-full w-12 h-12"
-            >
-              {{ post.user.username[0] }}
-              {{ post.user.username[1] }}
-            </router-link>
-          </div> -->
           <div class="flex items-center justify-between px-6 md:px-8 py-2 w-full">
             <p class="text-black text-sm pr-4">
               {{ post.description }}
@@ -71,14 +59,16 @@
               </router-link>
             </div>
           </div>
-        </router-link>
+        </router-link> -->
+        <TimelinePost :post="post" />
       </li>
     </ul>
   </div>
 </template>
 <script>
 import { mapActions } from "vuex";
-import PlayIconSvg from "@/assets/svgs/play-icon-svg.svg";
+// import PlayIconSvg from "@/assets/svgs/play-icon-svg.svg";
+import TimelinePost from "@/components/TimelinePost";
 
 export default {
   name: "TimelineHomepage",
@@ -88,7 +78,8 @@ export default {
     };
   },
   components: {
-    PlayIconSvg
+    // PlayIconSvg,
+    TimelinePost,
   },
   created() {
     // fetch post feed

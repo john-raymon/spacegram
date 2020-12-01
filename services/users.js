@@ -7,6 +7,7 @@ const config = require('config');
  * services
  */
 const postService = require('@/services/posts');
+const mailgunService = require('@/services/mailgun');
 
 /**
  * models
@@ -454,7 +455,12 @@ module.exports = {
           return user
             .save()
             .then(function(user) {
-              return req.login(user, () => res.json({ success: true, user: user.authSerialize() }));
+              // TODO: send confirmation email
+              return mailgunService
+                .sendWelcomeEmail(user.email, user.firstName, user.username)
+                .then(() => {
+                  return req.login(user, () => res.json({ success: true, user: user.authSerialize() }));
+                })
             })
         })
         .catch(next);

@@ -2,7 +2,6 @@
  * config
  */
 const config = require('config');
-
 const apiKey = config.get('mailgun.apiKey');
 const domain = config.get('mailgun.domain');
 
@@ -11,12 +10,16 @@ const domain = config.get('mailgun.domain');
  */
 const mailgun = require("mailgun-js")({apiKey, domain});
 
+const fs = require('fs');
+
 module.exports = {
   sendWelcomeEmail(email, firstName, username) {
+    const onlyinstaLogo = fs.createReadStream('./onlyinsta-logo.png');
     const data = {
       from: 'hello@mail.onlyinsta.com',
       to: email,
       subject: "Welcome to OnlyInsta!",
+      inline: [onlyinstaLogo],
       template: 'welcome-to-onlyinsta',
       'v:user_first_name': firstName,
       'v:user_onlyinsta_profile_link': `OnlyInsta.com/${username}`,

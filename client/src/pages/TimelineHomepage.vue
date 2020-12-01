@@ -68,7 +68,7 @@
         <InfoIconSvg />
       </div>
       <h2>
-        No post available.
+        No posts available.
       </h2>
     </div>
   </div>

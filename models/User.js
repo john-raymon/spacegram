@@ -59,7 +59,7 @@ const UserSchema = new mongoose.Schema(
     stripeExpressUserId: String,
     randomKey: { type: String, index: true },
     suspendedCreator: Boolean,
-    monthlySubscriptionPriceInCents: { type: Number, default: '299'}, // TODO: make subscription price configurable via settings
+    monthlySubscriptionPriceInCents: { type: Number, default: '1000'}, // TODO: make subscription price configurable via settings
   },
   { timestamps: true }
 );

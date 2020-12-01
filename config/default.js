@@ -6,6 +6,10 @@ module.exports = {
     secret: process.env.APP_SECRET_KEY_PROD,
     mongodbUri: process.env.MONGODB_URI_PROD,
   },
+  mailgun: {
+    apiKey: process.env.MAILGUN_API_KEY,
+    domain: process.env.MAILGUN_DOMAIN,
+  },
   // todo: add aws credentials here and replace in code with config references rather than processes
   stripe: {
     secretKey: process.env.STRIPE_TEST_SECRET_KEY,

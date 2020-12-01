@@ -3,11 +3,25 @@ const router = express.Router();
 const service = require('@/services/users');
 const middleware = require('@/middleware');
 const User = require('@/models/User');
+const ObjectId = require('mongoose').Types.ObjectId;
 
 router.param(':creatorUserId', function(req, res, next, creatorUserId) {
-  return User.findOne({
-    _id: creatorUserId,
-    suspendedCreator: false || undefined
+  let isValidObjectId = true;
+  try {
+    ObjectId(creatorUserId);
+  }
+  catch(e) {
+    isValidObjectId = false;
+  }
+  return User.findOne({ $or: [
+    {
+      _id: isValidObjectId ? creatorUserId : null,
+      suspendedCreator: false || undefined
+    },
+    {
+      username: creatorUserId,
+      suspendedCreator: false || undefined
+    }]
   })
     .exec()
     .then((user) => {

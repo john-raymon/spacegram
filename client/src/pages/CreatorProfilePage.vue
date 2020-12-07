@@ -193,8 +193,8 @@ export default {
         ._get(`/users/${this.$route.params.id}/posts`)
         .then(
           function(res) {
-            if (res.success) {
-              this.following = true;
+            if (res.following) {
+              this.following = res.following;
               this.creator = res.creator;
               this.subscription = res.subscription;
               this.posts = res.posts.filter(p => !p.deleted);
@@ -210,12 +210,12 @@ export default {
                   };
                 });
               }
+              return;
             }
             // not following, so set creator data, and allow UI to show
             // subscribe form to follow
-            if (res.creator) {
-              this.creator = res.creator;
-            }
+            this.creator = res.creator;
+            this.following = res.following;
           }.bind(this)
         )
         .catch(error => {

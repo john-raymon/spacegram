@@ -92,11 +92,13 @@ module.exports = {
         // TODO: since iterating through each post to generate a signed url
         // is expensive, we need use the cloudfront cookie protected urls
         // instead of signed protected urls
+        // helper function to return response for subscribed user/or logged in user's signed urls for post and other data
         const getAllCreatorPost = () => Post.find({
           user: req.creatorUser.id,
         }).exec().then((posts) => {
           const postWithSignedUrls = postService.mapSignedUrlsToPost(posts);
           return {
+            following: true,
             monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
             success: true,
             posts: postWithSignedUrls,
@@ -109,13 +111,15 @@ module.exports = {
             }
           };
         });
+
         if (req.creatorUser.id === req.user.id) {
+          // no need to check if subscription exist since user requesting posts is same user logged in
           // return creator posts to creator
           return getAllCreatorPost().then((postRes) => {
             return res.json(postRes)
           });
         } else {
-          // find an active subscription to allow access to the creators posts
+          // not requesting user is not the creator user, so find an active subscription to allow access to the creators posts
           return Subscription
             .findOne({
               subscriber: req.user.id,
@@ -125,8 +129,23 @@ module.exports = {
               }
             })
             .then((subscription) => {
+              /**
+               * if user is logged in but not subscribed then return unsubscribed creator profile response data
+               */
               if (!subscription) {
-                return res.json({ following: false, creator: { monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || '', id: req.creatorUser.id, imageFile: req.creatorUser.imageFile }, name: "ForbiddenError" })
+                return res.json({
+                  success: true,
+                  following: false,
+                  creator: {
+                    monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
+                    firstName: req.creatorUser.firstName || '',
+                    lastName: req.creatorUser.lastName || '',
+                    username: req.creatorUser.username || '',
+                    id: req.creatorUser.id,
+                    imageFile: req.creatorUser.imageFile
+                  },
+                  name: "ForbiddenError"
+                })
               }
               return getAllCreatorPost().then((postRes) => {
                 return res.json({...postRes, subscription })
@@ -138,7 +157,11 @@ module.exports = {
          * TODO: add pagination support in later version
          */
       } else {
+        /**
+         * the user is not logged in, thus not subscribed, so return unsubscribed creator profile response data
+         */
         return res.json({
+          success: true,
           following: false,
           monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
           success: true,
@@ -239,7 +262,7 @@ module.exports = {
             // The destination parameter directs the transfer of funds from onlyinsta to creator
             transfer_data: {
               // Send the amount for the creator after collecting a 20% platform fee:
-              amount: req.creatorUser.monthlySubscriptionPriceInCents * 0.8,
+              amount: req.creatorUser.monthlySubscriptionPriceInCents * 0.85,
               destination: req.creatorUser.stripeExpressUserId,
             },
           })
@@ -375,7 +398,7 @@ module.exports = {
             .then((subscriptions) => {
               subscriptions.forEach(subscription => {
                 return stripe.transfers.create({
-                  amount: user.monthlySubscriptionPriceInCents * 0.8,
+                  amount: user.monthlySubscriptionPriceInCents * 0.85,
                   currency: 'usd',
                   source_transaction: subscription.stripeChargeId,
                   destination: user.stripeExpressUserId,

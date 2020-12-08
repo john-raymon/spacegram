@@ -122,9 +122,10 @@
         </div>
         <button
           @click="subscribeToCreator"
+          v-show="monthlySubscriptionPrice"
           class="text-red-800 font-medium text-md bg-white py-3 px-6 outline-none focus:outline-none focus:bg-red-100 hover:bg-red-100 mx-auto rounded-full"
         >
-          Subscribe now for $10/month
+          {{ `Subscribe now for ${(monthlySubscriptionPrice / 100).toFixed(2)}/month` }}
         </button>
         <span class="text-xs text-white text-center block my-4 leading-none"
           >(no automatic renewals)</span
@@ -149,6 +150,7 @@ export default {
       subscription: null,
       stats: null,
       creatorNotFound: false,
+      monthlySubscriptionPrice: null,
     };
   },
   components: {
@@ -193,10 +195,11 @@ export default {
         ._get(`/users/${this.$route.params.id}/posts`)
         .then(
           function(res) {
-            if (res.success) {
-              this.following = true;
+            if (res.following) {
+              this.following = res.following;
               this.creator = res.creator;
               this.subscription = res.subscription;
+              this.monthlySubscriptionPrice = res.monthlySubscriptionPriceInCents;
               this.posts = res.posts.filter(p => !p.deleted);
               // TODO: store this date globally, so that we can reuse the other computed data dervived
               // from this for other views, instead of making the same request against
@@ -210,12 +213,13 @@ export default {
                   };
                 });
               }
+              return;
             }
             // not following, so set creator data, and allow UI to show
             // subscribe form to follow
-            if (res.creator) {
-              this.creator = res.creator;
-            }
+            this.creator = res.creator;
+            this.following = res.following;
+            this.monthlySubscriptionPrice = res.monthlySubscriptionPriceInCents || '0';
           }.bind(this)
         )
         .catch(error => {

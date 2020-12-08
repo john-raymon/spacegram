@@ -102,6 +102,7 @@ UserSchema.methods.authSerialize = function() {
     username: this.username,
     imageFile: this.imageFile,
     hasConnectedToStripe: (this.stripeExpressUserId ? true : false),
+    monthlySubscriptionPriceInCents: this.monthlySubscriptionPriceInCents,
   };
 };
 

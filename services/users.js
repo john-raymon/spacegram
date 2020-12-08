@@ -92,15 +92,18 @@ module.exports = {
         // TODO: since iterating through each post to generate a signed url
         // is expensive, we need use the cloudfront cookie protected urls
         // instead of signed protected urls
+        // helper function to return response for subscribed user/or logged in user's signed urls for post and other data
         const getAllCreatorPost = () => Post.find({
           user: req.creatorUser.id,
         }).exec().then((posts) => {
           const postWithSignedUrls = postService.mapSignedUrlsToPost(posts);
           return {
+            following: true,
             monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
             success: true,
             posts: postWithSignedUrls,
             creator: {
+              monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
               firstName: req.creatorUser.firstName || '',
               lastName: req.creatorUser.lastName || '',
               username: req.creatorUser.username || '',
@@ -109,13 +112,15 @@ module.exports = {
             }
           };
         });
+
         if (req.creatorUser.id === req.user.id) {
+          // no need to check if subscription exist since user requesting posts is same user logged in
           // return creator posts to creator
           return getAllCreatorPost().then((postRes) => {
             return res.json(postRes)
           });
         } else {
-          // find an active subscription to allow access to the creators posts
+          // not requesting user is not the creator user, so find an active subscription to allow access to the creators posts
           return Subscription
             .findOne({
               subscriber: req.user.id,
@@ -125,8 +130,24 @@ module.exports = {
               }
             })
             .then((subscription) => {
+              /**
+               * if user is logged in but not subscribed then return unsubscribed creator profile response data
+               */
               if (!subscription) {
-                return res.json({ following: false, creator: { monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents, firstName: req.creatorUser.firstName || '', lastName: req.creatorUser.lastName || '', username: req.creatorUser.username || '', id: req.creatorUser.id, imageFile: req.creatorUser.imageFile }, name: "ForbiddenError" })
+                return res.json({
+                  success: true,
+                  following: false,
+                  monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
+                  creator: {
+                    monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
+                    firstName: req.creatorUser.firstName || '',
+                    lastName: req.creatorUser.lastName || '',
+                    username: req.creatorUser.username || '',
+                    id: req.creatorUser.id,
+                    imageFile: req.creatorUser.imageFile
+                  },
+                  name: "ForbiddenError"
+                })
               }
               return getAllCreatorPost().then((postRes) => {
                 return res.json({...postRes, subscription })
@@ -138,12 +159,17 @@ module.exports = {
          * TODO: add pagination support in later version
          */
       } else {
+        /**
+         * the user is not logged in, thus not subscribed, so return unsubscribed creator profile response data
+         */
         return res.json({
+          success: true,
           following: false,
           monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
           success: true,
           posts: [],
           creator: {
+            monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
             firstName: req.creatorUser.firstName || '',
             lastName: req.creatorUser.lastName || '',
             username: req.creatorUser.username || '',
@@ -239,7 +265,7 @@ module.exports = {
             // The destination parameter directs the transfer of funds from onlyinsta to creator
             transfer_data: {
               // Send the amount for the creator after collecting a 20% platform fee:
-              amount: req.creatorUser.monthlySubscriptionPriceInCents * 0.8,
+              amount: req.creatorUser.monthlySubscriptionPriceInCents * 0.85,
               destination: req.creatorUser.stripeExpressUserId,
             },
           })
@@ -373,9 +399,12 @@ module.exports = {
             hasBeenTransferred: false,
           }).exec()
             .then((subscriptions) => {
+              debugger;
               subscriptions.forEach(subscription => {
+                debugger;
+                // TODO: set schedule to retry failed non-destination subscription charge transfers
                 return stripe.transfers.create({
-                  amount: user.monthlySubscriptionPriceInCents * 0.8,
+                  amount: Math.round((subscription.priceInCents) * 0.85),
                   currency: 'usd',
                   source_transaction: subscription.stripeChargeId,
                   destination: user.stripeExpressUserId,
@@ -383,7 +412,10 @@ module.exports = {
                   subscription.hasBeenTransferred = true;
                   subscription.stripeTransferId = transfer.id;
                   return subscription.save();
-                }).catch(console.log('silienty swallow this error'));
+                }).catch((error) => {
+                  debugger;
+                  console.log('silienty swallow this error');
+                });
               })
               const _compare = req.user.authSerialize();
               const userObj = user.authSerialize();
@@ -487,6 +519,29 @@ module.exports = {
       for (const prop in req.body) {
         if (whitelistedKeys.includes(prop)) {
           req.user[prop] = req.body[prop];
+        }
+      }
+      if (req.body.monthlySubscriptionPrice) {
+        const isNumeric = (input) => {
+          const numRe = /^-{0,1}\d*\.{0,1}\d+$/;
+          return (numRe.test(input));
+        }
+        const isGreaterThan75Cents = (input) => {
+          if (input < 0.75) {
+            return false;
+          }
+          return true;
+        }
+        if (isNumeric(req.body.monthlySubscriptionPrice)) {
+          if (!isGreaterThan75Cents(req.body.monthlySubscriptionPrice)) {
+            return next({
+              name: 'ValidationError',
+              message: 'Your subscription price must be at least 0.75 cents.',
+            });
+          }
+          // TODO: send email after updating subscription price
+          // if passes above validation, convert to cents, and set value on user property
+          req.user.monthlySubscriptionPriceInCents = req.body.monthlySubscriptionPrice * 100;
         }
       }
       return req.user

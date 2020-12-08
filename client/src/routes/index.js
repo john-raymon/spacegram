@@ -11,6 +11,7 @@ import SettingsPage from "@/pages/SettingsPage";
 import ChangePasswordPage from "@/pages/Settings/ChangePasswordPage";
 import UpdateAccountInformation from "@/pages/Settings/UpdateAccountInformation";
 import SetUpStripePage from "@/pages/Settings/SetUpStripePage";
+import SetSubscriptionPricePage from '@/pages/Settings/SetSubscriptionPricePage';
 import store from "@/vuex";
 
 const routes = [
@@ -31,6 +32,14 @@ const routes = [
     name: "settings-page",
     path: "/settings",
     component: SettingsPage,
+    meta: {
+      requireUserAuth: true
+    }
+  },
+  {
+    name: "set-subscription-price",
+    path: "/settings/set-subscription-price",
+    component: SetSubscriptionPricePage,
     meta: {
       requireUserAuth: true
     }

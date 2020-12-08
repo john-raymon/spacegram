@@ -215,7 +215,6 @@ module.exports = {
       if (req.user.id === req.creatorUser.id) {
         return next({
           name: 'BadRequest',
-          message: "Nice try, you cannot subscribe to yourself."
         })
       }
       const subscriptionConfirmationCode = crypto.randomBytes(8).toString("hex");
@@ -265,7 +264,7 @@ module.exports = {
             // The destination parameter directs the transfer of funds from onlyinsta to creator
             transfer_data: {
               // Send the amount for the creator after collecting a 20% platform fee:
-              amount: req.creatorUser.monthlySubscriptionPriceInCents * 0.85,
+              amount: Math.round(req.creatorUser.monthlySubscriptionPriceInCents * 0.85),
               destination: req.creatorUser.stripeExpressUserId,
             },
           })
@@ -300,10 +299,15 @@ module.exports = {
           return newSubscription
             .save()
             .then((subscription) => {
-              return res.json({
-                success: true,
-                subscription: subscription.getSubscriptionObject()
-              })
+              // send new subscriber email notification to creator
+              return mailgunService
+                .sendNewSubscriberEmail(req.creatorUser.email, req.creatorUser.firstName)
+                .finally(() => {
+                  return res.json({
+                    success: true,
+                    subscription: subscription.getSubscriptionObject()
+                  })
+                })
             })
         }
         return next({

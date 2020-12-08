@@ -36,7 +36,7 @@
                 {{ s.subscriber.username }}
               </router-link>
             </td>
-            <td>${{ ((s.priceInCents / 100) * 0.8).toFixed(2) }}</td>
+            <td>${{ ((s.priceInCents / 100) * 0.85).toFixed(2) }}</td>
             <td class="text-right">${{ (s.priceInCents / 100).toFixed(2) }}</td>
           </tr>
         </tbody>
@@ -58,7 +58,7 @@
                 {{ s.subscriber.username }}
               </router-link>
             </td>
-            <td class="text-right px-1">${{ ((s.priceInCents / 100) * 0.8).toFixed(2) }}</td>
+            <td class="text-right px-1">${{ ((s.priceInCents / 100) * 0.85).toFixed(2) }}</td>
             <td class="text-right px-1">${{ (s.priceInCents / 100).toFixed(2) }}</td>
           </tr>
         </tbody>
@@ -155,7 +155,7 @@ export default {
               isAuth: true,
               user: res.user
             });
-            return alert("You\re all set-up to start getting paid!");
+            return alert("You're all set-up to start getting paid!");
           }
           throw Error(res);
         })

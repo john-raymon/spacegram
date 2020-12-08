@@ -215,7 +215,6 @@ module.exports = {
       if (req.user.id === req.creatorUser.id) {
         return next({
           name: 'BadRequest',
-          message: "Nice try, you cannot subscribe to yourself."
         })
       }
       const subscriptionConfirmationCode = crypto.randomBytes(8).toString("hex");
@@ -300,10 +299,15 @@ module.exports = {
           return newSubscription
             .save()
             .then((subscription) => {
-              return res.json({
-                success: true,
-                subscription: subscription.getSubscriptionObject()
-              })
+              // send new subscriber email notification to creator
+              return mailgunService
+                .sendNewSubscriberEmail(req.creatorUser.email, req.creatorUser.firstName)
+                .finally(() => {
+                  return res.json({
+                    success: true,
+                    subscription: subscription.getSubscriptionObject()
+                  })
+                })
             })
         }
         return next({

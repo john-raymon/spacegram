@@ -27,6 +27,19 @@ module.exports = {
 
     return mailgun.messages().send(data);
   },
+  sendNewSubscriberEmail(email, firstName) {
+    const onlyinstaLogo = fs.createReadStream('./onlyinsta-logo.png');
+    const data = {
+      from: 'hello@mail.onlyinsta.com',
+      to: email,
+      subject: "You have a new subscriber.",
+      inline: [onlyinstaLogo],
+      template: 'new-subscriber',
+      'v:user_first_name': firstName,
+    };
+
+    return mailgun.messages().send(data);
+  },
   // sendSharedCardEmail(to, data) {
   //   return mailgun.messages().send({
   //     from: 'Split - Virtual debit cards <example@example.com>',

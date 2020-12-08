@@ -103,6 +103,7 @@ module.exports = {
             success: true,
             posts: postWithSignedUrls,
             creator: {
+              monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
               firstName: req.creatorUser.firstName || '',
               lastName: req.creatorUser.lastName || '',
               username: req.creatorUser.username || '',
@@ -136,6 +137,7 @@ module.exports = {
                 return res.json({
                   success: true,
                   following: false,
+                  monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
                   creator: {
                     monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
                     firstName: req.creatorUser.firstName || '',
@@ -167,6 +169,7 @@ module.exports = {
           success: true,
           posts: [],
           creator: {
+            monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
             firstName: req.creatorUser.firstName || '',
             lastName: req.creatorUser.lastName || '',
             username: req.creatorUser.username || '',
@@ -396,9 +399,12 @@ module.exports = {
             hasBeenTransferred: false,
           }).exec()
             .then((subscriptions) => {
+              debugger;
               subscriptions.forEach(subscription => {
+                debugger;
+                // TODO: set schedule to retry failed non-destination subscription charge transfers
                 return stripe.transfers.create({
-                  amount: user.monthlySubscriptionPriceInCents * 0.85,
+                  amount: Math.round((subscription.priceInCents) * 0.85),
                   currency: 'usd',
                   source_transaction: subscription.stripeChargeId,
                   destination: user.stripeExpressUserId,
@@ -406,7 +412,10 @@ module.exports = {
                   subscription.hasBeenTransferred = true;
                   subscription.stripeTransferId = transfer.id;
                   return subscription.save();
-                }).catch(console.log('silienty swallow this error'));
+                }).catch((error) => {
+                  debugger;
+                  console.log('silienty swallow this error');
+                });
               })
               const _compare = req.user.authSerialize();
               const userObj = user.authSerialize();
@@ -510,6 +519,29 @@ module.exports = {
       for (const prop in req.body) {
         if (whitelistedKeys.includes(prop)) {
           req.user[prop] = req.body[prop];
+        }
+      }
+      if (req.body.monthlySubscriptionPrice) {
+        const isNumeric = (input) => {
+          const numRe = /^-{0,1}\d*\.{0,1}\d+$/;
+          return (numRe.test(input));
+        }
+        const isGreaterThan75Cents = (input) => {
+          if (input < 0.75) {
+            return false;
+          }
+          return true;
+        }
+        if (isNumeric(req.body.monthlySubscriptionPrice)) {
+          if (!isGreaterThan75Cents(req.body.monthlySubscriptionPrice)) {
+            return next({
+              name: 'ValidationError',
+              message: 'Your subscription price must be at least 0.75 cents.',
+            });
+          }
+          // TODO: send email after updating subscription price
+          // if passes above validation, convert to cents, and set value on user property
+          req.user.monthlySubscriptionPriceInCents = req.body.monthlySubscriptionPrice * 100;
         }
       }
       return req.user

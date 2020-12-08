@@ -23,11 +23,12 @@
 </template>
 <script>
 import { Money } from "v-money";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "SubscriptionPrice",
   components: {
-    Money
+    Money,
   },
   data() {
     return {
@@ -41,42 +42,54 @@ export default {
       loading: false
     };
   },
+  watch: {
+    userAuth: {
+      handler() {
+        if (this.userAuth.user) {
+          this.subPrice = this.userAuth.user.monthlySubscriptionPriceInCents / 100;
+        }
+      },
+      immediate: true
+    }
+  },
+  computed: {
+    ...mapState(["userAuth"]),
+  },
   methods: {
+    ...mapActions(["updateUserAuth"]),
     handleSubmit() {
       this.loading = true;
       if (this.subPrice < 0.75) {
         this.loading = false;
         return alert("Your subscription price must be at least 0.75 cents.");
       }
-      this.loading = false;
-
-      // this.$http
-      //   ._patch("/users", {
-      //     currentPassword: this.currentPassword,
-      //     password: this.newPassword
-      //   })
-      //   .then(res => {
-      //     if (!res.success) {
-      //       return alert(
-      //         res.message || "Sorry, we weren't able to save your changes at this time."
-      //       );
-      //     }
-      //     this.currentPassword = "";
-      //     this.newPassword = "";
-      //     this.confirmNewPassword = "";
-      //     return alert("Your changes have been saved!");
-      //   })
-      //   .catch(res => {
-      //     return alert(
-      //       res.response &&
-      //         res.response.data &&
-      //         (res.response.data.message ||
-      //           "Sorry, we weren't able to save your changes at this time.")
-      //     );
-      //   })
-      //   .finally(() => {
-      //     this.loading = false;
-      //   });
+      this.$http
+        ._patch("/users", {
+          monthlySubscriptionPrice: this.subPrice,
+        })
+        .then(res => {
+          if (!res.success) {
+            return alert(
+              res.message || "Sorry, we weren't able to save your changes at this time."
+            );
+          }
+          this.updateUserAuth({
+            isAuth: true,
+            user: res.user,
+          })
+          return alert("Your changes have been saved!");
+        })
+        .catch(res => {
+          return alert(
+            res.response &&
+              res.response.data &&
+              (res.response.data.message ||
+                "Sorry, we weren't able to save your changes at this time.")
+          );
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     }
   }
 };

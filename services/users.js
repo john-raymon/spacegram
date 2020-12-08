@@ -399,9 +399,7 @@ module.exports = {
             hasBeenTransferred: false,
           }).exec()
             .then((subscriptions) => {
-              debugger;
               subscriptions.forEach(subscription => {
-                debugger;
                 // TODO: set schedule to retry failed non-destination subscription charge transfers
                 return stripe.transfers.create({
                   amount: Math.round((subscription.priceInCents) * 0.85),
@@ -413,7 +411,6 @@ module.exports = {
                   subscription.stripeTransferId = transfer.id;
                   return subscription.save();
                 }).catch((error) => {
-                  debugger;
                   console.log('silienty swallow this error');
                 });
               })

@@ -264,7 +264,7 @@ module.exports = {
             // The destination parameter directs the transfer of funds from onlyinsta to creator
             transfer_data: {
               // Send the amount for the creator after collecting a 20% platform fee:
-              amount: req.creatorUser.monthlySubscriptionPriceInCents * 0.85,
+              amount: Math.round(req.creatorUser.monthlySubscriptionPriceInCents * 0.85),
               destination: req.creatorUser.stripeExpressUserId,
             },
           })

@@ -254,7 +254,7 @@ module.exports = {
         if (req.creatorUser.stripeExpressUserId) {
           // make destination stripe charge
           return stripe.charges.create({
-            source: process.env.development ? req.body.stripeCardToken : 'tok_visa',
+            source: (process.env.NODE_ENV !== 'development') ? req.body.stripeCardToken : 'tok_visa',
             amount: req.creatorUser.monthlySubscriptionPriceInCents,
             currency: 'usd', // TODO: add support for user configurable currencies
             description: 'OnlyInsta Subscription',
@@ -274,7 +274,7 @@ module.exports = {
           // when the user does connect to stripe (mark this subscription with nonDestinationCharge for now
           // then hasBeenTransferred when this is queried for and transferred after Stripe Connecting)
           return stripe.charges.create({
-            source: process.env.development ? req.body.stripeCardToken : 'tok_visa',
+            source: (process.env.NODE_ENV !== 'development') ? req.body.stripeCardToken : 'tok_visa',
             amount: req.creatorUser.monthlySubscriptionPriceInCents,
             currency: "usd",
             description: "OnlyInsta Subscription",

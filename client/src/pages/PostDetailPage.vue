@@ -62,7 +62,7 @@
                 </div>
               </router-link>
             </div>
-            <button @click.stop class="w-5 h-5 text-black fill-current">
+            <button v-if="isCreator" @click.stop="toggleOptionsModal" class="w-5 h-5 text-black fill-current">
               <div class="w-5 h-5">
                 <EllipsisIconSvg />
               </div>
@@ -70,6 +70,18 @@
           </div>
         </div>
       </div>
+      <OptionsModal @close-modal="toggleOptionsModal" v-if="showOptionsModal">
+        <template v-slot:body>
+          <ul class="w-full">
+            <li class="text-red-500 text-center border-b border-gray-200 py-4 cursor-pointer">
+              <button @click="deletePost">Delete</button>
+            </li>
+            <li class="text-black text-center py-4 cursor-pointer">
+              <button @click="toggleOptionsModal">Cancel</button>
+            </li>
+          </ul>
+        </template>
+      </OptionsModal>
       <LikesModal @close-modal="toggleLikesModal" v-if="showLikesModal">
         <template v-slot:heading>
           <h1 class="text-black">
@@ -130,17 +142,22 @@ export default {
       loading: null,
       creator: null,
       post: null,
-      showLikesModal: false
+      showLikesModal: false,
+      showOptionsModal: false,
     };
   },
   components: {
     HeartSvg,
     HeartFilledSvg,
     LikesModal: Modal,
+    OptionsModal: Modal,
     EllipsisIconSvg,
   },
   computed: {
     ...mapState(["userAuth"]),
+    isCreator() {
+      return this.userAuth.user ? (this.post.user._id === this.userAuth.user.id) : false;
+    },
     postLikesText() {
       if (this.post && this.post.likes) {
         return `${this.post.likes.length} like${this.post.likes.length === 1 ? "" : "s"}`;
@@ -158,6 +175,27 @@ export default {
     this.fetchPost();
   },
   methods: {
+    deletePost() {
+      if (window.confirm("Are you sure you want to delete this post?")) {
+        this.toggleOptionsModal();
+        this.$http._delete(`/posts/${this.post._id}`)
+          .then((res) => {
+            if (res.success) {
+              alert("Your post has been removed.");
+              this.$router.push(`/${this.userAuth.user.username}`);
+            } else {
+              return alert("Sorry, we weren't able to remove your post right now.")
+            }
+          })
+          .catch((err) => {
+            console.log('There was an error while attempting to remove the post', err);
+            alert("Sorry, we weren't able to remove your post right now.")
+          })
+      };
+    },
+    toggleOptionsModal() {
+      this.showOptionsModal = !this.showOptionsModal;
+    },
     toggleLikesModal() {
       this.showLikesModal = !this.showLikesModal;
     },

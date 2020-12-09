@@ -1,6 +1,6 @@
 <template>
   <div class="py-6 mx-auto text-white w-full px-2 md:px-4">
-    <div v-if="creator" class="flex  justify-between items-center py-2 pb-4 mb-4 mx-auto space-x-4">
+    <div v-if="creator" class="flex justify-between items-center py-2 pb-4 mb-4 mx-auto space-x-2">
       <div class="flex items-center flex-wrap md:space-x-4">
         <router-link
           :to="`/creator/${creator.id}`"
@@ -26,7 +26,7 @@
         </p>
       </div>
       <div>
-        <div class="flex space-x-6 text-red-100 text-sm md:text-lg justify-end py-2">
+        <div class="flex space-x-3 text-red-100 text-sm md:text-lg justify-end py-2">
           <p v-if="postCount !== null" class="text-4xl leading-none font-bold text-center">
             {{ postCount }}
             <span class="text-xs text-center block font-light">

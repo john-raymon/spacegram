@@ -87,6 +87,12 @@ module.exports = {
   ],
   getAllPostsForACreator: [
     (req, res, next) => {
+      const getPostCount = () => Post.count({
+        user: req.creatorUser.id,
+        deleted: { $in: [undefined, false ]},
+      }).exec().then((postCount) => {
+        return postCount;
+      });
       if (req.userLoggedIn) {
         // authorize only the creator or a subscriber
         // TODO: since iterating through each post to generate a signed url
@@ -95,6 +101,7 @@ module.exports = {
         // helper function to return response for subscribed user/or logged in user's signed urls for post and other data
         const getAllCreatorPost = () => Post.find({
           user: req.creatorUser.id,
+          deleted: { $in: [undefined, false ]},
         }).exec().then((posts) => {
           const postWithSignedUrls = postService.mapSignedUrlsToPost(posts);
           return {
@@ -102,6 +109,7 @@ module.exports = {
             monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
             success: true,
             posts: postWithSignedUrls,
+            postCount: posts.length,
             creator: {
               monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
               firstName: req.creatorUser.firstName || '',
@@ -113,12 +121,13 @@ module.exports = {
           };
         });
 
+
         if (req.creatorUser.id === req.user.id) {
           // no need to check if subscription exist since user requesting posts is same user logged in
           // return creator posts to creator
           return getAllCreatorPost().then((postRes) => {
             return res.json(postRes)
-          });
+          }).catch(next);
         } else {
           // not requesting user is not the creator user, so find an active subscription to allow access to the creators posts
           return Subscription
@@ -134,26 +143,29 @@ module.exports = {
                * if user is logged in but not subscribed then return unsubscribed creator profile response data
                */
               if (!subscription) {
-                return res.json({
-                  success: true,
-                  following: false,
-                  monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
-                  creator: {
+                return getPostCount().then((postCount) => {
+                  return res.json({
+                    success: true,
+                    following: false,
+                    postCount,
                     monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
-                    firstName: req.creatorUser.firstName || '',
-                    lastName: req.creatorUser.lastName || '',
-                    username: req.creatorUser.username || '',
-                    id: req.creatorUser.id,
-                    imageFile: req.creatorUser.imageFile
-                  },
-                  name: "ForbiddenError"
+                    creator: {
+                      monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
+                      firstName: req.creatorUser.firstName || '',
+                      lastName: req.creatorUser.lastName || '',
+                      username: req.creatorUser.username || '',
+                      id: req.creatorUser.id,
+                      imageFile: req.creatorUser.imageFile
+                    },
+                    name: "ForbiddenError"
+                  })
                 })
               }
               return getAllCreatorPost().then((postRes) => {
                 return res.json({...postRes, subscription })
               })
             })
-            .catch(() => next({ name: "ForbiddenError" }))
+            .catch(next)
         }
         /**
          * TODO: add pagination support in later version
@@ -162,21 +174,24 @@ module.exports = {
         /**
          * the user is not logged in, thus not subscribed, so return unsubscribed creator profile response data
          */
-        return res.json({
-          success: true,
-          following: false,
-          monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
-          success: true,
-          posts: [],
-          creator: {
+        return getPostCount().then((postCount) => {
+          return res.json({
+            success: true,
+            following: false,
+            postCount,
             monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
-            firstName: req.creatorUser.firstName || '',
-            lastName: req.creatorUser.lastName || '',
-            username: req.creatorUser.username || '',
-            id: req.creatorUser.id,
-            imageFile: req.creatorUser.imageFile
-          }
-        });
+            success: true,
+            posts: [],
+            creator: {
+              monthlySubscriptionPriceInCents: req.creatorUser.monthlySubscriptionPriceInCents,
+              firstName: req.creatorUser.firstName || '',
+              lastName: req.creatorUser.lastName || '',
+              username: req.creatorUser.username || '',
+              id: req.creatorUser.id,
+              imageFile: req.creatorUser.imageFile
+            }
+          });
+        }).catch(next)
       }
     },
   ],

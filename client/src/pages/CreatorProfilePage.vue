@@ -1,5 +1,5 @@
 <template>
-  <div class="pb-6 mx-auto text-white w-full px-4">
+  <div class="py-6 mx-auto text-white w-full px-2 md:px-4">
     <div v-if="creator" class="flex  justify-between items-center py-2 pb-4 mb-4 mx-auto space-x-4">
       <div class="flex items-center flex-wrap md:space-x-4">
         <router-link
@@ -25,31 +25,39 @@
           @<span class="capitalize">{{ creator.username }}</span>
         </p>
       </div>
-      <div v-if="stats">
-        <div class="flex space-x-6 text-red-100 text-sm md:text-lg">
-          <router-link to="/subscribers" class="text-6xl leading-none font-bold text-center">
-            {{ stats.followers.length }}
+      <div>
+        <div class="flex space-x-6 text-red-100 text-sm md:text-lg justify-end py-2">
+          <p v-if="postCount !== null" class="text-4xl leading-none font-bold text-center">
+            {{ postCount }}
             <span class="text-xs text-center block font-light">
-              Subscribers
+              Posts
             </span>
-          </router-link>
-          <router-link to="/following" class="text-6xl leading-none font-bold text-center">
-            {{ stats.following.length }}
-            <span class="text-xs text-center block font-light">
-              Following
-            </span>
-          </router-link>
+          </p>
+          <template v-if="stats">
+            <router-link to="/subscribers" class="text-4xl leading-none font-bold text-center">
+              {{ stats.followers.length }}
+              <span class="text-xs text-center block font-light">
+                Subscribers
+              </span>
+            </router-link>
+            <router-link to="/following" class="text-4xl leading-none font-bold text-center">
+              {{ stats.following.length }}
+              <span class="text-xs text-center block font-light">
+                Following
+              </span>
+            </router-link>
+          </template>
         </div>
-        <p class="text-xs text-center py-2 opacity-50">
+        <p v-if="stats" class="text-xs text-center py-2 opacity-50">
           (only you can see this)
         </p>
+        <p v-if="following && subscription" class="text-red-300 text-sm md:text-base">
+          <template v-if="following && subscription">
+            Your monthly subscription expires on:
+            <span class="capitalize">{{ formattedExpDate }}</span>
+          </template>
+        </p>
       </div>
-      <p v-else-if="following && subscription" class="text-red-300 text-sm md:text-lg">
-        <template v-if="following && subscription">
-          Your subscription for this page expires on
-          <span class="capitalize">{{ formattedExpDate }}</span>
-        </template>
-      </p>
     </div>
     <template v-if="creatorNotFound">
      <p class="text-white text-3xl text-center my-4">
@@ -146,6 +154,7 @@ export default {
       following: false,
       creator: null,
       posts: [],
+      postCount: null,
       subscribeError: "",
       subscription: null,
       stats: null,
@@ -200,7 +209,8 @@ export default {
               this.creator = res.creator;
               this.subscription = res.subscription;
               this.monthlySubscriptionPrice = res.monthlySubscriptionPriceInCents;
-              this.posts = res.posts.filter(p => !p.deleted);
+              this.posts = res.posts;
+              this.postCount = res.postCount;
               // TODO: store this date globally, so that we can reuse the other computed data dervived
               // from this for other views, instead of making the same request against
               // check if logged-in user's creator-profile, if so, fetch follower, following count
@@ -219,6 +229,7 @@ export default {
             // subscribe form to follow
             this.creator = res.creator;
             this.following = res.following;
+            this.postCount = res.postCount;
             this.monthlySubscriptionPrice = res.monthlySubscriptionPriceInCents || '0';
           }.bind(this)
         )

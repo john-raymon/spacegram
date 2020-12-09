@@ -71,13 +71,7 @@
             </div>
           </router-link>
         </div>
-        <button @click.stop class="w-5 h-5 text-black fill-current">
-          <div class="w-5 h-5">
-            <EllipsisIconSvg />
-          </div>
-        </button>
       </div>
-
     </div>
     <LikesModal @close-modal="toggleLikesModal" v-if="showLikesModal">
       <template v-slot:heading>
@@ -130,7 +124,6 @@ import HeartFilledSvg from "@/assets/svgs/filled-heart-icon.svg";
 import { mapState } from "vuex";
 import Modal from "@/components/Modal";
 import PlayIconSvg from "@/assets/svgs/play-icon-svg.svg";
-import EllipsisIconSvg from '@/assets/svgs/ellipsis-icon-svg.svg';
 
 export default {
   name: "TimelinePost",
@@ -154,7 +147,6 @@ export default {
     HeartFilledSvg,
     LikesModal: Modal,
     PlayIconSvg,
-    EllipsisIconSvg,
   },
   computed: {
     ...mapState(["userAuth"]),

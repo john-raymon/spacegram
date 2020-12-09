@@ -6,9 +6,7 @@
     <div @click.stop class="rounded-md w-full max-w-md bg-white h-auto shadow-md p-6">
       <div v-if="showHeader" class="header-container flex flex-row justify-between">
         <slot name="heading">
-          <h1 class="text-black">
-            Title
-          </h1>
+          <p></p>
         </slot>
         <button @click.stop="$emit('close-modal')" class="w-6 h-6 text-black fill-current">
           <CloseIconSvg />

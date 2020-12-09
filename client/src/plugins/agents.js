@@ -53,8 +53,10 @@ class Agent {
     return res.data;
   }
 
-  _del(url) {
-    return this.superagent.del(`${this.API_ROOT}${url}`).then(this._responseBody);
+  _delete(url, fullPath = false) {
+    return axios
+      .delete(fullPath ? url : `${this.API_ROOT}${url}`)
+      .then(this._responseBody);
   }
 
   _get(url, fullPath = false, query = {}) {

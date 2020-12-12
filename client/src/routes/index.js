@@ -12,13 +12,17 @@ import ChangePasswordPage from "@/pages/Settings/ChangePasswordPage";
 import UpdateAccountInformation from "@/pages/Settings/UpdateAccountInformation";
 import SetUpStripePage from "@/pages/Settings/SetUpStripePage";
 import SetSubscriptionPricePage from '@/pages/Settings/SetSubscriptionPricePage';
+import LandingPage from '@/pages/LandingPage';
 import store from "@/vuex";
 
 const routes = [
   {
     name: "home",
     path: "/",
-    component: SignInPage
+    component: LandingPage,
+    meta: {
+      layout: "landing-page-layout",
+    },
   },
   {
     name: "timeline",
@@ -134,12 +138,12 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, from, next) => {
   const isUserAuth = store.state.userAuth.isAuth;
-  if (to.name === "home" && isUserAuth) {
-    // when logged in, redirect to timeline-homepage, not sign-in/sign-up homepage
-    return next({
-      name: "timeline"
-    });
-  }
+  // if (to.name === "home" && isUserAuth) {
+  //   // when logged in, redirect to timeline-homepage, not sign-in/sign-up homepage
+  //   return next({
+  //     name: "timeline"
+  //   });
+  // }
   if (to.matched.some(record => record.meta.requireUserAuth)) {
     // this route requires user auth, check if logged in
     // if not, redirect to register/login page.

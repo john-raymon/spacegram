@@ -4,6 +4,7 @@ import VueRouter from "vue-router";
 import router from "./routes";
 import globalComponentInstaller from "@/plugins/globalComponentInstaller";
 import DefaultLayout from "@/layout/DefaultLayout";
+import LandingPageLayout from "@/layout/LandingPageLayout";
 import ApiAgent from "@/plugins/agents";
 import store from "@/vuex";
 import "./assets/tailwind.css";
@@ -12,7 +13,7 @@ Vue.use(VueRouter);
 
 // globally register layout components
 Vue.use(globalComponentInstaller, {
-  components: [["default-layout", DefaultLayout]]
+  components: [["default-layout", DefaultLayout], ["landing-page-layout", LandingPageLayout]]
 });
 
 Vue.mixin({

@@ -122,7 +122,7 @@
       </ul>
       <div v-else-if="userAuth.isAuth" class="flex flex-col max-w-screen-md mx-auto">
         <p class="text-white text-3xl text-center mb-2">
-          Want to follow {{ creator && creator.username }}'s page?
+          Pay to unlock {{ creator && creator.username }}'s page
         </p>
         <!-- Stripe.js handles populating card-element-->
         <div class="p-5 bg-gray-900 rounded-lg mb-4">

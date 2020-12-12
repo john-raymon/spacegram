@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="bottom-hero-container flex flex-col md:flex-row justify-between items-center">
-      <div class="md:order-last w-full md:w-1/2 md:pl-10">
+      <div class="md:order-last w-full md:w-1/2">
         <p class="pink-gradient-text-color text-center md:text-right leading-none text-4xl md:text-6xl font-ram tracking-normal">
           ACCEPT TIPS
           <br/>

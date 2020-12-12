@@ -3,11 +3,13 @@
     <div class="hero-container flex flex-col md:flex-row justify-between items-center">
       <div class="w-full md:w-1/2 md:pr-5">
         <p class="pink-gradient-text-color text-center md:text-left leading-none text-4xl md:text-6xl font-ram tracking-normal">
-          START EARNING
-          <br/>
-          FROM YOUR FANS
-          <br/>
-          INSTANTLY.
+          <span>
+            START EARNING
+            <br/>
+            FROM YOUR FANS
+            <br/>
+            INSTANTLY.
+          </span>
           <span class="block pt-2 md:pt-6 text-white text-2xl md:text-4xl leading-none uppercase">
             with paid subscriptions
           </span>
@@ -23,11 +25,13 @@
     <div class="bottom-hero-container flex flex-col md:flex-row justify-between items-center">
       <div class="md:order-last w-full md:w-1/2">
         <p class="pink-gradient-text-color text-center md:text-right leading-none text-4xl md:text-6xl font-ram tracking-normal">
-          ACCEPT TIPS
-          <br/>
-          FROM
-          <br/>
-          SUBSCRIBERS.
+          <span>
+            ACCEPT TIPS
+            <br/>
+            FROM
+            <br/>
+            SUBSCRIBERS.
+          </span>
           <span class="block pt-2 md:pt-6 text-white text-2xl md:text-4xl leading-none uppercase">
             (TIPS & LIVE COMING SOON)
           </span>

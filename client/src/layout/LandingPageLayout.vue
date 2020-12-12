@@ -1,20 +1,15 @@
 <template>
   <div class="default-layout">
-    <nav class="transparent-background-shadow sticky top-0 w-full text-white z-50 px-3">
-      <div class="flex items-center px-3 pt-10 max-w-screen-lg mx-auto">
-        <router-link to="/" class="w-48 text-white fill-current">
-          <OnlyInstaLogo />
+    <nav class="transparent-background-shadow sticky top-0 w-full text-white z-50 px-4 py-4">
+      <div class="flex items-center px-2 md:px-5 pt-10 max-w-screen-lg mx-auto">
+        <router-link to="/" class="w-40 md:w-52 text-white fill-current">
+          <OnlyInstaLogo width="100%" />
         </router-link>
         <ul class="flex justify-end text-xs md:text-sm w-full space-x-4">
           <template v-if="userAuth.isAuth">
             <li>
-              <router-link to='/timeline'>
-                Timeline
-              </router-link>
-            </li>
-            <li>
               <router-link :to="`/creator/${userAuth.user.id}`">
-                Profile
+                Go to app
               </router-link>
             </li>
             <li>
@@ -30,8 +25,8 @@
           </template>
           <template v-else>
             <li>
-              <router-link to="/sign-in">
-                Sign in
+              <router-link to="/sign-up" class="pink-gradient-background rounded-full px-8 py-3 font-ram uppercase tracking-widest font-thin text-xs">
+                Get started
               </router-link>
             </li>
           </template>
@@ -42,7 +37,7 @@
       <slot />
     </main>
     <div
-      v-if="userAuth.isAuth && $route.name !== 'create-post'"
+      v-if="userAuth.isAuth"
       class="bottom-0 sticky pb-4 mx-auto w-20"
     >
       <div
@@ -72,7 +67,7 @@ import OnlyInstaLogo from "@/assets/svgs/onlyinsta-logo-svg.svg";
 import UploadIcon from "@/assets/svgs/upload-icon-svg.svg";
 
 export default {
-  name: "DefaultLayout",
+  name: "LandingPageLayout",
   props: ["userAuth"],
   components: {
     OnlyInstaLogo,
@@ -87,7 +82,7 @@ body {
 }
 .default-layout {
   @apply h-full mx-auto w-full;
-  background-color: #131313;
+  background-color: #000000;
   .main {
     @apply flex max-w-screen-lg px-6 py-4 mx-auto;
     min-height: calc(100vh); // 6.25rem is the height of the footer in this layout

@@ -18,7 +18,7 @@ const UserSchema = new mongoose.Schema(
       index: true,
       required: [true, "is required"],
       default: () => (`user${crypto.randomBytes(4).toString("hex")}`),
-      match: [/^(?=[a-zA-Z0-9._]{4,12}$)(?!.*[_.]{2})[^_.].*[^_.]$/, "is invalid, it must be atleast four characters long with no special characters, only numbers and letters."],
+      match: [/^(?=[a-zA-Z0-9._]{4,30}$)(?!.*[_.]{2})[^_.].*[^_.]$/, "is invalid, it must be atleast four characters long with no special characters, only numbers and letters."],
     },
     email: {
       type: String,

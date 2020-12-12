@@ -2,10 +2,10 @@
   <div class="default-layout">
     <nav class="transparent-background-shadow sticky top-0 w-full text-white z-50 px-3">
       <div class="flex items-center px-3 pt-10 max-w-screen-lg mx-auto">
-        <router-link to="/" class="w-48 text-white fill-current">
+        <router-link to="/" class="w-32 md:w-48 text-white fill-current">
           <OnlyInstaLogo />
         </router-link>
-        <ul class="flex justify-end text-xs md:text-sm w-full space-x-4">
+        <ul class="flex justify-end text-xs md:text-sm w-full space-x-3 md:space-x-4">
           <template v-if="userAuth.isAuth">
             <li>
               <router-link to='/timeline'>

@@ -19,7 +19,7 @@
         </p>
       </div>
       <div class="py-4 md:p-0 w-full md:w-1/2">
-        <img src="@/assets/onlyinsta-profile-image.png" class="w-full px-4 md:pr-0 md:pl-8 h-auto" />
+        <img src="@/assets/onlyinsta-profile-image-new.png" class="w-full px-4 md:pr-0 md:pl-8 h-auto" />
       </div>
     </div>
     <div class="bottom-hero-container flex flex-col md:flex-row justify-between items-center">

@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const uniqueValidator = require("mongoose-unique-validator");
 const config = require('config');
 const secret = config.get('app.secret');
+const jwt = require("jsonwebtoken");
 
 /**
  * TODO: add support unique user created names
@@ -91,7 +92,7 @@ UserSchema.methods.validPassword = function(password) {
   return this.hash === hash;
 };
 
-UserSchema.methods.authSerialize = function() {
+UserSchema.methods.authSerialize = function(accessToken = true) {
   return {
     id: this.id,
     email: this.email,
@@ -101,9 +102,37 @@ UserSchema.methods.authSerialize = function() {
     lastLoginAt: new Date(this.lastLoginAt).toUTCString(),
     username: this.username,
     imageFile: this.imageFile,
-    hasConnectedToStripe: (this.stripeExpressUserId ? true : false),
-    monthlySubscriptionPriceInCents: this.monthlySubscriptionPriceInCents,
+    accessToken: (() => {
+      if (!accessToken) {
+        return undefined;
+      }
+      return this.generateJWT();
+    })(),
   };
+};
+
+UserSchema.methods.serialize = function() {
+  return {
+    id: this.id,
+    firstName: this.firstName,
+    username: this.username,
+    imageFile: this.imageFile,
+  };
+};
+
+UserSchema.methods.generateJWT = function() {
+  const today = new Date();
+  let exp = new Date(today);
+  exp.setDate(today.getDate() + 30);
+
+  return jwt.sign(
+    {
+      sub: "user",
+      id: this._id,
+      exp: parseInt(exp.getTime() / 1000)
+    },
+    secret
+  );
 };
 
 const User = mongoose.model("User", UserSchema);

@@ -504,11 +504,12 @@ module.exports = {
             .save()
             .then(function(user) {
               // TODO: send confirmation email
-              return mailgunService
-                .sendWelcomeEmail(user.email, user.firstName, user.username)
-                .then(() => {
-                  return req.login(user, () => res.json({ success: true, user: user.authSerialize() }));
-                })
+              return res.json({ success: true, user: user.authSerialize() });
+              // return mailgunService
+              //   .sendWelcomeEmail(user.email, user.firstName, user.username)
+              //   .then(() => {
+              //     return res.json({ success: true, user: user.authSerialize() });
+              //   })
             })
         })
         .catch(next);
@@ -628,7 +629,8 @@ module.exports = {
         }
         user.lastLoginAt = Date.now();
         return user.save().then(() => {
-          return req.login(user, () => res.json({ success: true, user: user.authSerialize() }));
+          return res.json({ success: true, user: user.authSerialize() });
+          // return req.login(user, () => res.json({ success: true, user: user.authSerialize() }));
         }).catch(next);
       })(req, res, next);
     },

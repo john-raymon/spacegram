@@ -16,6 +16,7 @@ const helmet = require('helmet');
 const history = require('connect-history-api-fallback');
 const passport = require("passport");
 const bodyParser = require("body-parser");
+
 const app = express();
 
 // Set up Mongodb
@@ -31,31 +32,31 @@ if (isProduction) {
   mongoose.set("debug", true);
 }
 
-app.use(session({
-  secret: secretKey,
-  saveUninitialized: false,
-  store: new MongoStore({ mongooseConnection: mongoose.connection, collection: 'sessions' }),
-  cookie: {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: true,
-    maxAge: (24 * 60 * 60 * 1000) * 15, // 15 days
-  },
-  resave: false,
-}));
+// app.use(session({
+//   secret: secretKey,
+//   saveUninitialized: false,
+//   store: new MongoStore({ mongooseConnection: mongoose.connection, collection: 'sessions' }),
+//   cookie: {
+//     httpOnly: true,
+//     secure: isProduction,
+//     sameSite: true,
+//     maxAge: (24 * 60 * 60 * 1000) * 15, // 15 days
+//   },
+//   resave: false,
+// }));
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 // log session stuff in dev.
-if (!isProduction) {
-  app.use((req, res, next) => {
-    console.log('req.session -->', req.session);
-    console.log('req.user -->', req.user);
-    console.log('req.passport session -->', req.session.passport)
-    next();
-  })
-}
+// if (!isProduction) {
+//   app.use((req, res, next) => {
+//     // console.log('req.session -->', req.session);
+//     console.log('req.user -->', req.user);
+//     // console.log('req.passport session -->', req.session.passport)
+//     next();
+//   })
+// }
 
 const sixtyDaysInSeconds = 5184000
 app.use(helmet.hsts({

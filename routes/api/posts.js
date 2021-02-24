@@ -19,18 +19,18 @@ router.param(":postId", function(req, res, next, postId) {
     .catch(next);
 });
 
-router.post("/:postId/toggle-like", middleware.sessionRequireUser, ...service.toggleLikePost)
+router.post("/:postId/toggle-like", middleware.requireAuthUser, ...service.toggleLikePost)
 
-router.get('/feed', middleware.sessionRequireUser, ...service.getPostFeed)
+router.get('/feed', middleware.requireAuthUser, ...service.getPostFeed)
 
 // Create a post, uploading a video/image file to Cloudinary
-router.post('/', middleware.sessionRequireUser, ...service.create);
+router.post('/', middleware.requireAuthUser, ...service.create);
 
 // Read a post, only giving authorization to the creator or subscriber
 // TODO: add support to allow active subscribers to have read access to the endpoint
-router.get('/:postId', middleware.sessionRequireUser, ...service.read);
+router.get('/:postId', middleware.requireAuthUser, ...service.read);
 
 // Delete a post, and remove it's file from Cloudinary
-router.delete('/:postId', middleware.sessionRequireUser, ...service.delete)
+router.delete('/:postId', middleware.requireAuthUser, ...service.delete)
 
 module.exports = router;

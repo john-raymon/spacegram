@@ -5,16 +5,16 @@ const User = require("@/models/User");
 
 const userPassport = new passport.Passport();
 
-passport.serializeUser(function(user, done) {
-  done(null, user.id);
-});
+// passport.serializeUser(function(user, done) {
+//   done(null, user.id);
+// });
 
-passport.deserializeUser(function(id, done) {
-  User.findById(id, function (err, user) {
-      if (err) { return done(err); }
-      done(null, user);
-  });
-});
+// passport.deserializeUser(function(id, done) {
+//   User.findById(id, function (err, user) {
+//       if (err) { return done(err); }
+//       done(null, user);
+//   });
+// });
 
 userPassport.use(
   new LocalStrategy(

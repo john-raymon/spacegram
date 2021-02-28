@@ -35,7 +35,6 @@ router.use(function(err, req, res, next) {
   if (err.name === "UnauthorizedError") {
     return res.status(401).json({
       success: false,
-      message: "You must be logged in",
       ...err,
     });
   }
